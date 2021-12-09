@@ -93,5 +93,5 @@ kubectl create secret generic s3-upload --from-literal=test=test-secret --namesp
 
 If you are applying config-only changes, they may not be applied automatically (k8s will not detect changes). In this case, you will need to trigger pods restart by execution of following command:
 ```sh
-kubectl rollout restart deployment xmpp-server
+kubectl rollout restart deployment xmpp-server --namespace tigase
 ```
