@@ -18,6 +18,12 @@ dataSource {
     'tigase-secondary-address' = env('EXTERNAL_IP')
 }
 
+bosh {
+    seeOtherHost (active: false) {}
+}
+c2s {
+    seeOtherHost (active: false) {}
+}
 http () {
     'dns-webservice' () {}
     index () {}
@@ -112,6 +118,10 @@ upload (active: false) {}
         'ssl-certificate-add' = 'LOCAL'
     }
 }
+ws2s {
+    seeOtherHost (active: false) {}
+}
+
 {{- end }}
 
 apiVersion: v1
