@@ -1,0 +1,146 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "tigase-xmpp-server.fullname" . }}
+  labels:
+    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "tigase-xmpp-server.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "tigase-xmpp-server.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "tigase-xmpp-server.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: xmpp-bosh
+              containerPort: 5280
+              protocol: TCP
+            - name: xmpp-c2s
+              containerPort: 5222
+              protocol: TCP
+            - name: xmpp-cs2s
+              containerPort: 5223
+              protocol: TCP
+            - name: xmpp-s2s
+              containerPort: 5269
+              protocol: TCP
+            - name: xmpp-ws2s
+              containerPort: 5290
+              protocol: TCP
+            - name: xmpp-wss2s
+              containerPort: 5291
+              protocol: TCP
+            - name: xmpp-cluster
+              containerPort: 5277
+              protocol: TCP 
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: DB_TYPE
+              value: {{ include "tigase.databaseType" . | quote }}
+            - name: DB_HOST
+              value: {{ include "tigase.databaseHost" . | quote }}
+            - name: DB_PORT
+              value: {{ include "tigase.databasePort" . | quote }}              
+            - name: DB_NAME
+              value: {{ include "tigase.databaseName" . | quote }}
+            - name: DB_USER
+              value: {{ include "tigase.databaseUser" . | quote }}
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "tigase.databaseSecretName" . | quote }}
+                  key: {{ .Values.database.secretPasswordKey | quote }}
+            - name: DB_ROOT_USER
+              value: {{ include "tigase.databaseUser" . | quote }}
+            - name: DB_ROOT_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "tigase.databaseSecretName" . | quote }}
+                  key: {{ .Values.database.secretPasswordKey | quote }}
+            - name: HTTP_UPLOAD_DOMAIN
+              value: {{ .Values.fileUpload.domain | quote }}
+            - name: HTTP_UPLOAD_MAX_FILESIZE
+              value: {{ .Values.fileUpload.maxFileSize | quote }}
+            - name: UPLOAD_S3_BUCKET
+              value: {{ .Values.fileUpload.s3storage.bucket | quote }}
+            - name: UPLOAD_S3_REGION
+              value: {{ .Values.fileUpload.s3storage.region | quote }}
+            - name: UPLOAD_S3_ACCESS_KEY_ID
+              value: {{ .Values.fileUpload.s3storage.accessKeyId | quote }}
+            - name: UPLOAD_S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.fileUpload.s3storage.secret | quote }}
+                  key: {{ .Values.fileUpload.s3storage.accessKeyId | quote }}              
+            - name: UPLOAD_S3_PATH_STYLE_ACCESS
+              value: {{ .Values.fileUpload.s3storage.pathStyleAccess | quote }}
+            - name: UPLOAD_S3_ENDPOINT_URL
+              value: {{ .Values.fileUpload.s3storage.endpointUrl | quote }}
+            - name: INTERNAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: EXTERNAL_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+            - name: VHOST
+              value: {{ include "tigase.vhost" . | quote }}
+            - name: ADMINS
+              value: {{ join "," .Values.admins | quote }}
+            - name: JANUS_URI
+              value: {{ .Values.meet.janusURI | quote }}
+            - name: COPY_CONFIG_SRC
+              value: "/config/tigase"
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - mountPath: /config/tigase
+            name: config
+      initContainers:
+      - name: init
+        image: busybox
+        command: ["sh", "-c", "until nslookup {{ include "tigase.databaseHost" . }}; do echo waiting for database; sleep 2; done;"]            
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "tigase-xmpp-server.fullname" . }}
+          items:
+          - key: "config.tdsl"
+            path: "config.tdsl"
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
