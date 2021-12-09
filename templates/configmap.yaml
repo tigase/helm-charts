@@ -85,6 +85,7 @@ upload () {
         protocol = 'https'
         serverName = env('HTTP_UPLOAD_DOMAIN')
     }
+{{- if eq .Values.fileUpload.storage "s3" }}
     store (class: tigase.extras.http.upload.S3Store, active: true, exportable: true) {
     	autocreateBucket = true
         bucket = env('UPLOAD_S3_BUCKET')
@@ -97,6 +98,7 @@ upload () {
         endpointUrl = env('UPLOAD_S3_ENDPOINT_URL')
         pathStyleAccess = env('UPLOAD_S3_PATH_STYLE_ACCESS')
     }
+{{- end }}
 }  
 {{- else }}
 upload (active: false) {}

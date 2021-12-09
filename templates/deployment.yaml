@@ -121,6 +121,10 @@ spec:
           volumeMounts:
           - mountPath: /config/tigase
             name: config
+          {{- if eq .Values.fileUpload.storage "persistent-volume" }}
+          - mountPath: /home/tigase/tigase-server/data/upload
+            name: upload-data
+          {{- end }}
       initContainers:
       - name: init
         image: busybox
@@ -132,6 +136,11 @@ spec:
           items:
           - key: "config.tdsl"
             path: "config.tdsl"
+      {{- if eq .Values.fileUpload.storage "persistent-volume" }}
+      - name: upload-data
+        persistentVolumeClaim:
+          claimName: {{ if .Values.fileUpload.pvStorage.existingClaim }}{{ .Values.fileUpload.pvStorage.existingClaim }}{{- else }}{{ printf "%s-upload" (include "tigase-xmpp-server.fullname" .) }}{{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

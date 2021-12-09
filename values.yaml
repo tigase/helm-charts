@@ -2,11 +2,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# no. of Tigase instances to create to form a cluster
 replicaCount: 1
 
 image:
   repository: tigase/tigase-xmpp-server
-  # repository: hantu85/tigase-k8s-test
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -37,16 +37,28 @@ securityContext: {}
   # runAsNonRoot: true
   # runAsUser: 1000
 
-vhost: "tigase"
+# main vhost of the XMPP server
+vhost: ""
 
+# list of admins of the XMPP server
 admins:
+#  - "admin1@example.com" 
+#  - "admin2@example.com"
 
 database:
+  # use "mysql" or "postgresql"
   type: "mysql"
+  # host name for accessing database
   host: ""
+  # use if different than default
+  port: ""
+  # name of the database to use
   name: "tigase"
+  # username for authentication
   user: "tigase"
+  # secret name containing password of the database user
   secret: ""
+  # ket of the secret containing password for the database user
   secretPasswordKey: "password"
 
 service:
@@ -60,18 +72,33 @@ service:
     wss2s: 5291
     http: 8080
     
+# HTTP File Upload
 fileUpload:
   enabled: false
+  # domain which should be used for HTTP File Upload (should be resolved to ingress if it is used)
   domain: ''
+  # max file size allowed to accept
   maxFileSize: "20971520"
+  storage: ''
+  # S3 file storage configuration
   s3storage:
     bucket: ''
     region: ''
+    # (optional)
     endpointUrl: ''
     accessKeyId: ''
+    # name of the secret containing password (accessKeyId is used as a secret key to retrieve actual value)
+    secret: ''
+    # (optional) 
     pathStyleAccess: ''    
-          
+  # PV storage configuration
+  pvStorage:
+    existingClaim: ''
+    storage: 5Gi
+
+# Configuration for Tigase Meet        
 meet:
+  # uri to access Janus from inside k8s cluster
   janusURI: "ws://janus:8188/"          
 
 sessMan:
@@ -94,9 +121,8 @@ ingress:
   ## - letsencrypt          
   sslProvider: "self-signed"
   tls: 
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  #   hosts:
+  #     - chart-example.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

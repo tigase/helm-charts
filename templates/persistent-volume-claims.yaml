@@ -1,0 +1,15 @@
+{{- if and (eq .Values.fileUpload.storage "persistent-volume") (not .Values.fileUpload.pvStorage.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ printf "%s-upload" (include "tigase-xmpp-server.fullname" .) }}
+  labels:
+    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+    tier: server
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.fileUpload.pvStorage.storage }}
+{{- end }}
