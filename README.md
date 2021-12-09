@@ -80,7 +80,8 @@ If your MySQL deployment is done in the same namespace and already created secre
 If not, you can execute 
 ```sh
 kubectl create secret generic mysql --from-literal=mysql-root-password=834ysjr34w --namespace tigase
-``` to create secret with MySQL password for use with above example yaml file.
+``` 
+to create secret with MySQL password for use with above example yaml file.
 
 ## Creation of S3 storage secret
 
