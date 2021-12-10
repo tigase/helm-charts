@@ -1,0 +1,22 @@
+{{- $portRange := untilStep (int .Values.ports.from) (int (add1 .Values.ports.to)) 1 -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "coturn.fullname" . }}
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 3478
+      targetPort: turn-3478
+      protocol: UDP
+      name: turn-3478
+    {{- range $portRange }}
+    - port: {{ . }}
+      targetPort: {{ . }}
+      protocol: UDP
+      name: turn-{{ . }}
+    {{- end }}      
+  selector:
+    {{- include "coturn.selectorLabels" . | nindent 4 }}
