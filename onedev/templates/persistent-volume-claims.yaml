@@ -1,0 +1,47 @@
+{{- if and .Values.onedev.persistentVolume.enabled (not .Values.onedev.persistentVolume.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "onedev.fullname" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: server
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.onedev.persistentVolume.storage }}
+{{- end }}
+---
+{{- if and .Values.mysql.persistentVolume.enabled (not .Values.mysql.persistentVolume.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mysql.fullname" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: database
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.persistentVolume.storage }}
+{{- end }}
+---
+{{- if and .Values.mysql.backupVolume.persistentVolume.enabled (not .Values.mysql.backupVolume.persistentVolume.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mysql.backupVolume" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: database
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.mysql.backupVolume.persistentVolume.storage }}
+{{- end }}

@@ -1,0 +1,256 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "onedev.fullname" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "onedev.selectorLabels" . | nindent 6 }}
+      tier: server
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "onedev.selectorLabels" . | nindent 8 }}
+        tier: server
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "onedev.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.onedev.image.repository }}:{{ .Values.onedev.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.onedev.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 6610
+          protocol: TCP
+        - name: ssh
+          containerPort: 6611
+          protocol: TCP
+        env:
+        - name: hibernate_dialect
+          value: org.hibernate.dialect.MySQL5InnoDBDialect
+        - name: hibernate_connection_driver_class
+          value: com.mysql.cj.jdbc.Driver
+        - name: hibernate_connection_url
+          value: jdbc:mysql://{{ include "mysql.fullname" . }}:3306/onedev?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+        - name: hibernate_connection_username
+          value: root
+        - name: hibernate_connection_password
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.databaseSecretName" . }}
+              key: password
+        - name: hibernate_hikari_maximumPoolSize
+          value: "25"              
+#        livenessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#          initialDelaySeconds: 60
+#        readinessProbe:
+#          httpGet:
+#            path: /
+#            port: http
+#          initialDelaySeconds: 60
+        volumeMounts:
+        - mountPath: "/opt/onedev"
+          name: onedev              
+      initContainers:
+      - name: init
+        image: busybox
+        command: ["sh", "-c", "until nslookup {{ include "mysql.fullname" . }}.onedev.svc.cluster.local; do echo waiting for mysql; sleep 2; done;"]
+      volumes:
+      - name: onedev
+      {{- if .Values.onedev.persistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ if .Values.onedev.persistentVolume.existingClaim }}{{ .Values.onedev.persistentVolume.existingClaim }}{{- else }}{{ template "onedev.fullname" . }}{{- end }}
+      {{- else }}
+        emptyDir:
+        {{- if .Values.onedev.emptyDir.sizeLimit }}
+          sizeLimit: {{ .Values.onedev.emptyDir.sizeLimit }}
+        {{- else }}
+          {}
+        {{- end }}
+      {{- end }}
+      {{- with .Values.onedev.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "mysql.fullname" . }}
+  labels:
+    {{- include "onedev.labels" . | nindent 4 }}
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "onedev.selectorLabels" . | nindent 6 }}
+      tier: database
+  strategy: 
+    type: Recreate
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "onedev.selectorLabels" . | nindent 8 }}
+        tier: database
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "onedev.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: mysql
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.mysql.image.repository }}:{{ .Values.mysql.image.tag }}"
+        imagePullPolicy: {{ .Values.onedev.image.pullPolicy }}
+        env:
+        - name: MYSQL_DATABASE
+          value: onedev
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.databaseSecretName" . }}
+              key: password
+        ports:
+        - name: mysql
+          containerPort: 3306
+          protocol: TCP
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
+        readinessProbe:
+          exec:
+            command:
+            - bash
+            - "-c"
+            - |
+              mysql -uroot -p$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+          initialDelaySeconds: 5
+          periodSeconds: 2
+          timeoutSeconds: 1
+      initContainers:
+      {{- if .Values.mysql.backupVolume.enabled }}
+      - name: init
+        image: busybox
+        command: 
+        - /bin/sh
+        - "-c"
+        - | 
+          if [ -z "$(ls -A /var/lib/mysql)" ]; then
+            echo No database files found.
+            if [ ! -z "$(ls -A /backup)" ]; then
+              echo Restoring database data..
+              cp -rp /backup/* /var/lib/mysql/
+            fi
+            echo Database data ready for use.
+          else
+            echo Database files already present.
+          fi
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
+        - name: mysql-backup
+          mountPath: /backup
+      {{- end }}
+      {{- if .Values.mysql.backupS3.enabled }}
+      - name: init-s3
+        image: perconalab/percona-xtrabackup
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.databaseSecretName" . }}
+              key: password
+        - name: S3_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.backupS3SecretName" . }}
+              key: endpoint                
+        - name: S3_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.backupS3SecretName" . }}
+              key: access-key
+        - name: S3_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.backupS3SecretName" . }}
+              key: secret-key
+        - name: S3_BUCKET
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "mysql.backupS3SecretName" . }}
+              key: bucket        
+        command: 
+        - /bin/sh
+        - "-c"
+        - | 
+          if [ -z "$(ls -A /var/lib/mysql)" ]; then
+            echo No database files found.
+              xbcloud get --storage=s3 --s3-endpoint="$S3_ENDPOINT" --s3-access-key=$S3_ACCESS_KEY --s3-secret-key=$S3_SECRET_KEY --s3-bucket=$S3_BUCKET $(date -I)-full_backup | xbstream -x -C /var/lib/mysql
+            echo Database data ready for use.
+          else
+            echo Database files already present.
+          fi
+        volumeMounts:
+        - name: mysql
+          mountPath: /var/lib/mysql
+      {{- end }}
+      volumes:
+      - name: mysql
+      {{- if .Values.mysql.persistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ if .Values.mysql.persistentVolume.existingClaim }}{{ .Values.mysql.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.fullname" . }}{{- end }}
+      {{- else }}
+        emptyDir:
+        {{- if .Values.mysql.emptyDir.sizeLimit }}
+          sizeLimit: {{ .Values.mysql.emptyDir.sizeLimit }}
+        {{- else }}
+          {}
+        {{- end }}
+      {{- end }}
+      {{- if .Values.mysql.backupVolume.enabled }}
+      - name: mysql-backup
+      {{- if .Values.mysql.backupVolume.persistentVolume.enabled }}
+        persistentVolumeClaim:
+          claimName: {{ if .Values.mysql.backupVolume.persistentVolume.existingClaim }}{{ .Values.mysql.backupVolume.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.backupVolume" . }}{{- end }}
+      {{- else }}
+        emptyDir:
+        {{- if .Values.mysql.emptyDir.sizeLimit }}
+          sizeLimit: {{ .Values.mysql.emptyDir.sizeLimit }}
+        {{- else }}
+          {}
+        {{- end }}
+      {{- end }}
+      {{- end }}
+      {{- with .Values.mysql.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
