@@ -1,0 +1,1 @@
+CoTURN is running on port 3478 and uses UDP ports {{ .Values.ports.from }}-{{ .Values.ports.to }}

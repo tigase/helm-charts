@@ -1,0 +1,83 @@
+{{- $portRange := untilStep (int .Values.ports.from) (int (add1 .Values.ports.to)) 1 -}}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "coturn.fullname" . }}
+  labels:
+    {{- include "coturn.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "coturn.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "coturn.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "coturn.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: COTURN_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: {{ .Values.secret.name }}
+                key: {{ .Values.secret.key }}
+          args:
+          - "-c"
+          - "/turnserver.conf"
+          - "--static-auth-secret=${COTURN_SECRET}"
+          - "--external-ip=$(detect-external-ip)"
+          ports:
+            - name: turn-3478
+              containerPort: 3478
+              protocol: UDP
+          {{- range $portRange }}
+            - name: turn-{{ . }}
+              containerPort: {{ . }}
+              hostPort: {{ . }}
+              protocol: UDP
+          {{- end }}
+          volumeMounts:
+            - name: coturn-config
+              mountPath: /turnserver.conf
+              subPath: turnserver.conf
+              readOnly: true
+            - name: var-tmp
+              mountPath: /var/tmp          
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: coturn-config
+          configMap:
+            name: {{ include "coturn.fullname" . }}-config
+        - name: var-tmp
+          emptyDir: {}      
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
