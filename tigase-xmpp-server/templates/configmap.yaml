@@ -1,0 +1,134 @@
+{{- define "config" }}
+admins = env('ADMINS')
+'cluster-mode' = true
+'config-type' = '--gen-config-def'
+'default-virtual-host' = env('VHOST')
+'vhost-register-enabled' = true
+'hardened-mode' = secure
+trusted = [ 'http@{clusterNode}' ]
+
+dataSource {
+    default () {
+        uri = 'jdbc:' + env('DB_TYPE') + '://' + env('DB_HOST', 'localhost') + ':' + env('DB_PORT', '5432') + '/' + env('DB_NAME', 'kangaroo_tigasedb') + '?user=' + env('DB_USER', 'kangaroo_db_user') + '&password=' + env('DB_PASS', 'kangaroo_db_pass')
+    }
+}
+
+'dns-resolver' {
+    'tigase-primary-address' = env('INTERNAL_IP')
+    'tigase-secondary-address' = env('EXTERNAL_IP')
+}
+
+bosh {
+    seeOtherHost (active: false) {}
+}
+c2s {
+    seeOtherHost (active: false) {}
+}
+http () {
+    'dns-webservice' () {}
+    index () {}
+    rest {}
+    server () {}
+    setup (active: false) {}
+    ui () {}
+}
+httpServer (class: tigase.http.jetty.JettyStandaloneHttpServer) {
+    'request-timeout' = 10000
+    connections {
+        8080 () {
+        }
+    }
+}
+'message-archive' () {}
+'message-router' () {
+    'detailed-memory-statistics' = true
+}
+meet () {
+    uri = env('JANUS_URI')
+}
+muc () {
+    'message-filter-enabled' = false
+    'ping-every-minute' = true
+    strategy (class: tigase.muc.cluster.ClusteredRoomStrategyV2) {}
+}
+pubsub () {
+    'persistent-pep' = true
+    'send-last-published-item-on-presence' = true
+    strategy (class: tigase.pubsub.cluster.ClusteredNodeStrategy) {}
+}
+'sess-man' {
+    amp () {
+{{- if .Values.sessMan.amp.threadsNo }}
+        threadsNo = {{ .Values.sessMan.amp.threadsNo }}
+{{- end }}
+    }
+    commands {
+        'http://jabber.org/protocol/admin#add-user' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'http://jabber.org/protocol/admin#change-user-password' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'http://jabber.org/protocol/admin#delete-user' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'http://jabber.org/protocol/admin#get-online-users-list' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'http://jabber.org/protocol/admin#get-registered-user-list' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'http://jabber.org/protocol/admin#user-stats' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+        'user-roster-management-ext' = ['DOMAIN_OWNER', 'DOMAIN_ADMIN' ]
+    }
+    'jabber:iq:privacy' () {}
+    'jabber:iq:register' () {}
+    'message-archive-xep-0136' () {}
+    'message-carbons' () {}
+    'jabber:iq:register' () {}
+    strategy (class: tigase.server.cluster.strategy.OnlineUsersCachingStrategy) {}
+    'urn:xmpp:mam:1' () {}
+    'urn:xmpp:mix:pam:2' () {}
+    'urn:xmpp:push:0' () {
+        away () {}
+    }
+}
+{{- if .Values.fileUpload.enabled }}
+upload () {
+    logic () {
+        'max-file-size' = env('HTTP_UPLOAD_MAX_FILESIZE')
+        port = '443'
+        protocol = 'https'
+        serverName = env('HTTP_UPLOAD_DOMAIN')
+    }
+{{- if eq .Values.fileUpload.storage "s3" }}
+    store (class: tigase.extras.http.upload.S3Store, active: true, exportable: true) {
+    	autocreateBucket = true
+        bucket = env('UPLOAD_S3_BUCKET')
+        bucketKeyPrefix = env('VHOST')
+{{- if .Values.fileUpload.s3storage.region }}
+        region = env('UPLOAD_S3_REGION')
+{{- end }}
+        accessKeyId = env('UPLOAD_S3_ACCESS_KEY_ID')
+        secretKey = env('UPLOAD_S3_SECRET_KEY')
+        endpointUrl = env('UPLOAD_S3_ENDPOINT_URL')
+        pathStyleAccess = env('UPLOAD_S3_PATH_STYLE_ACCESS')
+    }
+{{- end }}
+}  
+{{- else }}
+upload (active: false) {}
+{{- end }}
+'vhost-man' {
+    commands {
+        'comp-repo-item-add' = 'LOCAL'
+        'comp-repo-item-remove' = 'LOCAL'
+        'comp-repo-item-update' = 'LOCAL'
+        'query-dns' = 'LOCAL'
+        'ssl-certificate-add' = 'LOCAL'
+    }
+}
+ws2s {
+    seeOtherHost (active: false) {}
+}
+
+{{- end }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "tigase-xmpp-server.fullname" . }}
+  labels:
+    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+data:
+  config.tdsl: {{ (include "config" .) | trim | quote }}

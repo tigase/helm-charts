@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tigase-xmpp-server.fullname" . }}
+  labels:
+    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.ports.http }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.ports.bosh }}
+      targetPort: xmpp-bosh
+      protocol: TCP
+      name: xmpp-bosh
+    - port: {{ .Values.service.ports.c2s }}
+      targetPort: xmpp-c2s
+      protocol: TCP
+      name: xmpp-c2s
+    - port: {{ .Values.service.ports.cs2s }}
+      targetPort: xmpp-cs2s
+      protocol: TCP
+      name: xmpp-cs2s
+    - port: {{ .Values.service.ports.ws2s }}
+      targetPort: xmpp-ws2s
+      protocol: TCP
+      name: xmpp-ws2s
+    - port: {{ .Values.service.ports.wss2s }}
+      targetPort: xmpp-wss2s
+      protocol: TCP
+      name: xmpp-wss2s
+    - port: {{ .Values.service.ports.s2s }}
+      targetPort: xmpp-s2s
+      protocol: TCP
+      name: xmpp-s2s
+  selector:
+    {{- include "tigase-xmpp-server.selectorLabels" . | nindent 4 }}
