@@ -11,10 +11,11 @@ spec:
       {{- include "coturn.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        checksum/coturn-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
         {{- include "coturn.selectorLabels" . | nindent 8 }}
     spec:
@@ -39,11 +40,15 @@ spec:
               secretKeyRef:
                 name: {{ .Values.secret.name }}
                 key: {{ .Values.secret.key }}
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
           args:
-          - "-c"
-          - "/turnserver.conf"
-          - "--static-auth-secret=${COTURN_SECRET}"
-          - "--external-ip=$(detect-external-ip)"
+            - "--listening-ip=${POD_IP}"
+            - "--static-auth-secret=${COTURN_SECRET}"
+            - "--external-ip=$(detect-external-ip)"
+            - "--relay-ip=$(detect-external-ip)"
           ports:
             - name: turn-3478
               containerPort: 3478

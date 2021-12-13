@@ -1,0 +1,1 @@
+1. Your application is now running headless (available only inside container)

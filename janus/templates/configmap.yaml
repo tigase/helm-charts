@@ -1,0 +1,96 @@
+kind: ConfigMap
+metadata:
+  name: {{ include "janus.fullname" . }}-config
+apiVersion: v1
+data:
+  janus.jcfg: |-
+    general: {
+      configs_folder = "/janus/etc/janus"			# Configuration files folder
+      plugins_folder = "/janus/lib/janus/plugins"			# Plugins folder
+      transports_folder = "/janus/lib/janus/transports"	# Transports folder
+      events_folder = "/janus/lib/janus/events"			# Event handlers folder
+      loggers_folder = "/janus/lib/janus/loggers"			# External loggers folder
+
+      debug_level = 4							# Debug/logging level, valid values are 0-7
+
+      admin_secret = "janusoverlord"	# String that all Janus requests must contain
+    
+      protected_folders = [
+        "/bin",
+        "/boot",
+        "/dev",
+        "/etc",
+        "/initrd",
+        "/lib",
+        "/lib32",
+        "/lib64",
+        "/proc",
+        "/sbin",
+        "/sys",
+        "/usr",
+        "/var",
+        "/opt/janus/bin",
+        "/opt/janus/etc",
+        "/opt/janus/include",
+        "/opt/janus/lib",
+        "/opt/janus/lib32",
+        "/opt/janus/lib64",
+        "/opt/janus/sbin"
+      ]
+    }
+    
+    certificates: {
+      cert_pem = "/etc/certs/fullchain.pem"
+      cert_key = "/etc/certs/privkey.pem"
+    }
+    
+    nat: {
+      stun_server = "stun.l.google.com"
+      stun_port = 19302
+      nice_debug = false
+      full_trickle = true
+      ice_lite = false
+    
+      ice_ignore_list = "vmnet"
+    }
+
+  janus.plugin.videoroom.jcfg: |-
+    general: {
+    }
+
+  janus.transport.http.jcfg: |-
+    general: {
+      json = "indented"				# Whether the JSON messages should be indented (default),
+      								# plain (no indentation) or compact (no indentation and no spaces)
+      base_path = "/janus"			# Base path to bind to in the web server (plain HTTP only)
+      http = false						# Whether to enable the plain HTTP interface
+      https = false					# Whether to enable HTTPS (default=false)
+      secure_port = 8089				# Web server HTTPS port, if enabled
+    }
+    
+    admin: {
+      admin_base_path = "/admin"			# Base path to bind to in the admin/monitor web server (plain HTTP only)
+      admin_http = true					# Whether to enable the plain HTTP interface
+      admin_https = false					# Whether to enable HTTPS (default=false)
+      admin_secure_port = 7889			# Admin/monitor web server HTTPS port, if enabled
+    }
+    cors: {
+    }
+    
+  janus.transport.websockets.jcfg: |-
+    general: {
+      json = "indented"				# Whether the JSON messages should be indented (default),
+      								# plain (no indentation) or compact (no indentation and no spaces)
+      ws = true						# Whether to enable the WebSockets API
+      ws_port = 8188					# WebSockets server por
+      wss = false						# Whether to enable secure WebSockets
+    }
+    
+    admin: {
+      admin_ws = false					# Whether to enable the Admin API WebSockets API
+      admin_ws_port = 7188				# Admin API WebSockets server port, if enabled
+      admin_wss = false					# Whether to enable the Admin API secure WebSocket
+    }
+    cors: {
+    }
+
