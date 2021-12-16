@@ -1,0 +1,126 @@
+{{- if .Values.backup.persistentVolume.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ printf "%s-backup-pv" (include "mysql.fullname" .) | trunc 63 | trimSuffix "-"  }}
+spec:
+  schedule: {{ .Values.backup.persistentVolume.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mysql-xtrabackup
+              image: perconalab/percona-xtrabackup
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: MYSQL_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.databaseSecretName" . }}
+                      key: mysql-root-password
+              command:
+                - /bin/sh
+                - "-c"
+                - |
+                  if [ ! -z "$(ls -A /var/lib/mysql)" ]; then
+                    rm -rf /backup/*
+                    /usr/bin/xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup --host={{ include "mysql.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }} --user=root --password=$MYSQL_ROOT_PASSWORD
+                    date
+                    echo Database backed up!
+                  fi
+              volumeMounts: 
+                - name: mysql
+                  mountPath: /var/lib/mysql
+                - name: mysql-backup
+                  mountPath: /backup
+          restartPolicy: Never
+          volumes:
+            - name: mysql
+              {{- if .Values.backup.persistentVolume.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistentVolume.existingClaim }}{{ .Values.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.fullname" . }}{{- end }}
+              {{- else }}
+              emptyDir:
+              {{- if .Values.emptyDir.sizeLimit }}
+                sizeLimit: {{ .Values.emptyDir.sizeLimit }}
+              {{- else }}
+                {}
+              {{- end }}
+              {{- end }}
+            - name: mysql-backup
+              persistentVolumeClaim:
+                claimName: {{ if .Values.backup.persistentVolume.existingClaim }}{{ .Values.backup.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.backupVolume" . }}{{- end }}
+{{- end }}
+---
+{{- if .Values.backup.s3.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ printf "%s-backup-s3" (include "mysql.fullname" .) | trunc 63 | trimSuffix "-"  }}
+spec:
+  schedule: {{ .Values.backup.s3.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: mysql-xtrabackup
+              image: perconalab/percona-xtrabackup
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: MYSQL_ROOT_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.databaseSecretName" . }}
+                      key: mysql-root-password
+                - name: S3_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.backupS3SecretName" . }}
+                      key: endpoint                
+                - name: S3_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.backupS3SecretName" . }}
+                      key: access-key
+                - name: S3_SECRET_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.backupS3SecretName" . }}
+                      key: secret-key
+                - name: S3_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: {{ include "mysql.backupS3SecretName" . }}
+                      key: bucket
+              command:
+                - /bin/sh
+                - "-c"
+                - |
+                  if [ ! -z "$(ls -A /var/lib/mysql)" ]; then
+                    rm -rf /backup/*
+                    /usr/bin/xtrabackup --backup --stream=xbstream --datadir=/var/lib/mysql/ --extra-lsndir=/backup --target-dir=/backup --host={{ include "mysql.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }} --user=root --password=$MYSQL_ROOT_PASSWORD | xbcloud put --storage=s3 --s3-endpoint="$S3_ENDPOINT" --s3-access-key=$S3_ACCESS_KEY --s3-secret-key=$S3_SECRET_KEY --s3-bucket=$S3_BUCKET --parallel=10 $(date -I)-full_backup
+                    date
+                    echo Database backed up!
+                  fi
+              volumeMounts: 
+                - name: mysql
+                  mountPath: /var/lib/mysql
+          restartPolicy: Never
+          volumes:
+            - name: mysql
+            {{- if .Values.persistentVolume.enabled }}
+              persistentVolumeClaim:
+                claimName: {{ if .Values.persistentVolume.existingClaim }}{{ .Values.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.fullname" . }}{{- end }}
+            {{- else }}
+              emptyDir:
+              {{- if .Values.emptyDir.sizeLimit }}
+                sizeLimit: {{ .Values.emptyDir.sizeLimit }}
+              {{- else }}
+                {}
+              {{- end }}
+            {{- end }}
+{{- end }} 

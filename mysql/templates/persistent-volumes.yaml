@@ -1,0 +1,29 @@
+{{- if and .Values.persistentVolume.enabled (not .Values.persistentVolume.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mysql.fullname" . }}
+  labels:
+    {{- include "mysql.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistentVolume.storage }}
+{{- end }}
+---
+{{- if and .Values.backup.persistentVolume.enabled (not .Values.backup.persistentVolume.existingClaim)  }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "mysql.backupVolume" . }}
+  labels:
+    {{- include "mysql.labels" . | nindent 4 }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.backup.persistentVolume.storage }}
+{{- end }}

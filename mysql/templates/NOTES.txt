@@ -1,0 +1,7 @@
+Service is available as {{ include "mysql.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}::{{ .Values.service.port }}
+
+Execute following command to get root password:
+
+  MYSQL_ROOT_PASSWORD=$(kubectl get secret --namespace {{ .Release.Namespace }} {{ template "mysql.databaseSecretName" . }} -o jsonpath="{.data.mysql-root-password}" | base64 --decode)
+
+To upgrade this helm chart (if you are not using 'auth.existingSecret') set 'auth.rootPassword' to current value. You can do that by retrieving root password as explained above and passing it with --set auth.rootPassword=$MYSQL_ROOT_PASSWORD parameter.
