@@ -60,6 +60,15 @@ spec:
               containerPort: 8080
               protocol: TCP
           env:
+            {{- if .Values.users.create }}
+            - name: ADMIN_JID
+              value: {{ join "," .Values.users.jids | quote }}
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.users.secret | quote }}
+                  key: "password"
+            {{- end }}
             - name: DB_TYPE
               value: {{ include "tigase.databaseType" . | quote }}
             - name: DB_HOST

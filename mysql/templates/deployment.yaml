@@ -6,6 +6,10 @@ metadata:
     {{- include "mysql.labels" . | nindent 4 }}
 spec:
   replicas: 1
+  {{- with .Values.updateStrategy }}
+  strategy:
+    type: {{ printf "%s" . }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "mysql.selectorLabels" . | nindent 6 }}
