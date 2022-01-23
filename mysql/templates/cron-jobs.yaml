@@ -12,7 +12,7 @@ spec:
         spec:
           containers:
             - name: mysql-xtrabackup
-              image: perconalab/percona-xtrabackup
+              image: perconalab/percona-xtrabackup:8.0.26-18
               imagePullPolicy: IfNotPresent
               env:
                 - name: MYSQL_ROOT_PASSWORD
@@ -26,7 +26,7 @@ spec:
                 - |
                   if [ ! -z "$(ls -A /var/lib/mysql)" ]; then
                     rm -rf /backup/*
-                    /usr/bin/xtrabackup --backup --datadir=/var/lib/mysql/ --target-dir=/backup --host={{ include "mysql.fullname" . }} --user=root --password=$MYSQL_ROOT_PASSWORD
+                    /usr/bin/xtrabackup --no-server-version-check --backup --datadir=/var/lib/mysql/ --target-dir=/backup --host={{ include "mysql.fullname" . }} --user=root --password=$MYSQL_ROOT_PASSWORD
                     date
                     echo Database backed up!
                   fi
@@ -68,7 +68,7 @@ spec:
         spec:
           containers:
             - name: mysql-xtrabackup
-              image: perconalab/percona-xtrabackup
+              image: perconalab/percona-xtrabackup:8.0.26-18
               imagePullPolicy: IfNotPresent
               env:
                 - name: MYSQL_ROOT_PASSWORD
@@ -77,10 +77,12 @@ spec:
                       name: {{ include "mysql.databaseSecretName" . }}
                       key: mysql-root-password
                 - name: S3_ENDPOINT
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ include "mysql.backupS3SecretName" . }}
-                      key: endpoint                
+                  value: {{ .Values.backup.s3.endpoint | quote }}
+                - name: S3_BUCKET
+                  value: {{ .Values.backup.s3.bucket | quote }}
+                - name: S3_PREFIX
+                  value: {{ include "mysql.backupS3Prefix" . }}
+             
                 - name: S3_ACCESS_KEY
                   valueFrom:
                     secretKeyRef:
@@ -91,18 +93,13 @@ spec:
                     secretKeyRef:
                       name: {{ include "mysql.backupS3SecretName" . }}
                       key: secret-key
-                - name: S3_BUCKET
-                  valueFrom:
-                    secretKeyRef:
-                      name: {{ include "mysql.backupS3SecretName" . }}
-                      key: bucket
               command:
                 - /bin/sh
                 - "-c"
                 - |
                   if [ ! -z "$(ls -A /var/lib/mysql)" ]; then
                     rm -rf /backup/*
-                    /usr/bin/xtrabackup --backup --stream=xbstream --datadir=/var/lib/mysql/ --extra-lsndir=/backup --target-dir=/backup --host={{ include "mysql.fullname" . }} --user=root --password=$MYSQL_ROOT_PASSWORD | xbcloud put --storage=s3 --s3-endpoint="$S3_ENDPOINT" --s3-access-key=$S3_ACCESS_KEY --s3-secret-key=$S3_SECRET_KEY --s3-bucket=$S3_BUCKET --parallel=10 $(date -I)-full_backup
+                    /usr/bin/xtrabackup --no-server-version-check --backup --compress --compress-threads=2 --stream=xbstream --datadir=/var/lib/mysql/ --extra-lsndir=/backup --target-dir=/backup --host={{ include "mysql.fullname" . }} --user=root --password=$MYSQL_ROOT_PASSWORD | xbcloud put --storage=s3 --s3-endpoint="$S3_ENDPOINT" --s3-access-key=$S3_ACCESS_KEY --s3-secret-key=$S3_SECRET_KEY --s3-bucket=$S3_BUCKET --parallel=10 $S3_PREFIX$(date +"%Y-%m-%d_%H-%M")-full_backup
                     date
                     echo Database backed up!
                   fi

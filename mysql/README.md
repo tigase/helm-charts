@@ -60,11 +60,14 @@ backup:
     enabled: true
     schedule: "5 1 * * *"
     existingSecret: "mysql-s3-backup"
+    endpoint: "s3.us-west-2.amazonaws.com"
+    bucket: "mysql-backup"
+    
 ```
 
 #### Creating secret for S3 storage for MySQL backup
 
 Before this will work, we need to create a secret with S3 configuration:
 ```
-kubectl create secret generic mysql-s3-backup --from-literal=endpoint=s3.us-west-2.amazonaws.com --from-literal=bucket=mysql-backup --from-literal=access-key=XX_USERNAME_XX --from-literal=secret-key=XX_PASSWORD_XX --namespace tigase
+kubectl create secret generic mysql-s3-backup --from-literal=access-key=XX_USERNAME_XX --from-literal=secret-key=XX_PASSWORD_XX --namespace tigase
 ```

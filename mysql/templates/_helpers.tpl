@@ -65,6 +65,14 @@ Create fully qualified database name
 {{- end -}}
 {{- end }}
 
+{{- define "mysql.backupS3Prefix" -}}
+{{- if .Values.backup.s3.prefix -}}
+  {{- printf "%s/" .Values.backup.s3.prefix -}}
+{{- else -}}
+  {{- printf "" -}}
+{{- end -}}
+{{- end }}
+
 {{/*
 Selector labels
 */}}

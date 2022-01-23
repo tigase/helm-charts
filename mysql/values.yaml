@@ -33,6 +33,9 @@ emptyDir:
   sizeLimit: ""   
 
 backup:
+  # execute backup now!
+  now: false
+  
   persistentVolume:
     enabled: false
     ## Cron job schedule
@@ -40,13 +43,27 @@ backup:
     ## If defined, PVC must be created manually before volume will be bound
     existingClaim: ""
     ## Size of a persistent volume to use
-    storage: 5Gi  
+    storage: 5Gi
+    
   s3:
     enabled: false
     ## Cron job schedule
     schedule: ""
+    endpoint: ""
+    bucket: ""
+    prefix: ""
     ## Name of the secret
     existingSecret: "" 
+    expireInDays: ""
+
+configuration: |-
+  [mysqld]
+  default_authentication_plugin=mysql_native_password  
+  skip-host-cache
+  skip-name-resolve  
+  performance_schema = off  
+  server-id = 1
+  binlog_format = ROW
 
 serviceAccount:
   # Specifies whether a service account should be created

@@ -1,0 +1,108 @@
+{{- if and .Values.backup.now .Values.backup.s3.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-backup-s3-now" (include "mysql.fullname" .) | trunc 63 | trimSuffix "-"  }}
+  annotations:
+    "helm.sh/hook": post-install,pre-delete,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: mysql-backup-s3-on-demand
+          image: perconalab/percona-xtrabackup:8.0.26-18
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mysql.databaseSecretName" . }}
+                  key: mysql-root-password
+            - name: S3_ENDPOINT
+              value: {{ .Values.backup.s3.endpoint | quote }}
+            - name: S3_BUCKET
+              value: {{ .Values.backup.s3.bucket | quote }}
+            - name: S3_PREFIX
+              value: {{ include "mysql.backupS3Prefix" . }}
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mysql.backupS3SecretName" . }}
+                  key: access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mysql.backupS3SecretName" . }}
+                  key: secret-key
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              if [ ! -z "$(ls -A /var/lib/mysql)" ]; then
+                /usr/bin/xtrabackup --no-server-version-check --backup --compress --compress-threads=2 --stream=xbstream --datadir=/var/lib/mysql/ --extra-lsndir=/backup --target-dir=/backup --host={{ include "mysql.fullname" . }} --user=root --password=$MYSQL_ROOT_PASSWORD | xbcloud put --storage=s3 --s3-endpoint="$S3_ENDPOINT" --s3-access-key=$S3_ACCESS_KEY --s3-secret-key=$S3_SECRET_KEY --s3-bucket=$S3_BUCKET --parallel=10 $S3_PREFIX$(date +"%Y-%m-%d_%H-%M")-full_backup
+                date
+                echo Database backed up!
+              fi
+          volumeMounts:
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+      restartPolicy: Never
+      volumes:
+        - name: mysql-data
+        {{- if .Values.persistentVolume.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ if .Values.persistentVolume.existingClaim }}{{ .Values.persistentVolume.existingClaim }}{{- else }}{{ template "mysql.fullname" . }}{{- end }}
+        {{- else }}
+          emptyDir:
+          {{- if .Values.emptyDir.sizeLimit }}
+            sizeLimit: {{ .Values.emptyDir.sizeLimit }}
+          {{- else }}
+            {}
+          {{- end }}
+        {{- end }}
+{{- end }}
+---
+{{- if and .Values.backup.s3.expireInDays .Values.backup.s3.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-s3-expire-setup" (include "mysql.fullname" .) | trunc 63 | trimSuffix "-"  }}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: mysql-s3-expire-setup
+          image: minio/mc
+          env:
+            - name: S3_EXPIRE_IN_DAYS
+              value: {{ .Values.backup.s3.expireInDays | quote }}
+            - name: S3_ENDPOINT
+              value: {{ .Values.backup.s3.endpoint | quote }}
+            - name: S3_BUCKET
+              value: {{ .Values.backup.s3.bucket | quote }}
+            - name: S3_PREFIX
+              value: {{ include "mysql.backupS3Prefix" . }}
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mysql.backupS3SecretName" . }}
+                  key: access-key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "mysql.backupS3SecretName" . }}
+                  key: secret-key
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              mc alias set backup $S3_ENDPOINT $S3_ACCESS_KEY $S3_SECRET_KEY
+              mc ilm rm -id CompetitionsAlphaMysqlBackup backup/$S3_BUCKET
+              echo { \"Rules\": [{ \"Expiration\": { \"Days\": $S3_EXPIRE_IN_DAYS }, \"ID\": \"CompetitionsAlphaMysqlBackup\", \"Filter\": { \"Prefix\": \"$S3_PREFIX\" }, \"Status\": \"Enabled\" }] }
+              echo { \"Rules\": [{ \"Expiration\": { \"Days\": $S3_EXPIRE_IN_DAYS }, \"ID\": \"CompetitionsAlphaMysqlBackup\", \"Filter\": { \"Prefix\": \"$S3_PREFIX\" }, \"Status\": \"Enabled\" }] } | mc ilm import backup/$S3_BUCKET
+      restartPolicy: Never
+{{- end }}
