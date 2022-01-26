@@ -47,14 +47,14 @@ spec:
         - name: hibernate_connection_driver_class
           value: com.mysql.cj.jdbc.Driver
         - name: hibernate_connection_url
-          value: jdbc:mysql://{{ include "mysql.fullname" . }}:3306/onedev?serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false
+          value: {{ printf "jdbc:mysql://%s:%s/%s?serverTimezone=UTC&useSSL=false&useUnicode=yes&allowPublicKeyRetrieval=true&characterEncoding=UTF-8" (include "onedev.databaseHost" .) (include "onedev.databasePort" .) (include "onedev.databaseName" .) | quote }}
         - name: hibernate_connection_username
           value: root
         - name: hibernate_connection_password
           valueFrom:
             secretKeyRef:
-              name: {{ include "mysql.databaseSecretName" . }}
-              key: password
+              name: {{ include "onedev.databaseSecretName" . | quote }}
+              key: mysql-root-password
         - name: hibernate_hikari_maximumPoolSize
           value: "25"              
 #        livenessProbe:
@@ -73,7 +73,7 @@ spec:
       initContainers:
       - name: init
         image: busybox
-        command: ["sh", "-c", "until nslookup {{ include "mysql.fullname" . }}.onedev.svc.cluster.local; do echo waiting for mysql; sleep 2; done;"]
+        command: ["sh", "-c", "until nslookup {{ include "onedev.databaseHost" . }}; do echo waiting for mysql; sleep 2; done;"]
       volumes:
       - name: onedev
       {{- if .Values.onedev.persistentVolume.enabled }}
@@ -92,6 +92,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 ---
+{{- if .Values.mysql.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -132,12 +133,12 @@ spec:
         imagePullPolicy: {{ .Values.onedev.image.pullPolicy }}
         env:
         - name: MYSQL_DATABASE
-          value: onedev
+          value: {{ include "onedev.databaseName" . }}
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "mysql.databaseSecretName" . }}
-              key: password
+              name: {{ include "onedev.databaseSecretName" . }}
+              key: mysql-root-password
         ports:
         - name: mysql
           containerPort: 3306
@@ -186,8 +187,8 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: {{ include "mysql.databaseSecretName" . }}
-              key: password
+              name: {{ include "onedev.databaseSecretName" . }}
+              key: mysql-root-password
         - name: S3_ENDPOINT
           valueFrom:
             secretKeyRef:
@@ -254,3 +255,4 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+{{- end }}

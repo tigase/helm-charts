@@ -37,7 +37,10 @@ mysql:
     pullPolicy: IfNotPresent
     tag: "8.0"
   
+  enabled: true
+  
   auth:
+    database: "onedev"
     ## Name of the existing secret storing root password of MySQL database
     existingSecret: ""
     

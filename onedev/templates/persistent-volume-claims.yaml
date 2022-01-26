@@ -14,7 +14,7 @@ spec:
       storage: {{ .Values.onedev.persistentVolume.storage }}
 {{- end }}
 ---
-{{- if and .Values.mysql.persistentVolume.enabled (not .Values.mysql.persistentVolume.existingClaim)  }}
+{{- if and .Values.mysql.enabled .Values.mysql.persistentVolume.enabled (not .Values.mysql.persistentVolume.existingClaim)  }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -30,7 +30,7 @@ spec:
       storage: {{ .Values.mysql.persistentVolume.storage }}
 {{- end }}
 ---
-{{- if and .Values.mysql.backupVolume.persistentVolume.enabled (not .Values.mysql.backupVolume.persistentVolume.existingClaim)  }}
+{{- if and .Values.mysql.enabled .Values.mysql.backupVolume.persistentVolume.enabled (not .Values.mysql.backupVolume.persistentVolume.existingClaim)  }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

@@ -68,13 +68,49 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{- define "mysql.databaseSecretName" -}}
-{{- if .Values.mysql.auth.existingSecret -}}
-  {{- printf "%s" .Values.mysql.auth.existingSecret -}}
+{{- define "onedev.databaseHost" -}}
+{{- if .Values.mysql.enabled }}
+    {{- printf "%s" (include "mysql.fullname" .) -}}
 {{- else -}}
-  {{- printf "%s" (include "mysql.fullname" .) -}}
+    {{- printf "%s" .Values.externalDatabase.host -}}
 {{- end -}}
-{{- end }}
+{{- end -}}
+
+{{- define "onedev.databasePort" -}}
+{{- if .Values.mysql.enabled }}
+    {{- printf "3306" -}}
+{{- else -}}
+    {{- printf "%d" (.Values.externalDatabase.port | int ) -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "onedev.databaseName" -}}
+{{- if .Values.mysql.enabled }}
+    {{- printf "%s" .Values.mysql.auth.database -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.database -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "onedev.databaseUser" -}}
+{{- if .Values.mysql.enabled }}
+    {{- printf "%s" .Values.mysql.auth.username -}}
+{{- else -}}
+    {{- printf "%s" .Values.externalDatabase.user -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "onedev.databaseSecretName" -}}
+{{- if .Values.mysql.enabled }}
+    {{- if .Values.mysql.auth.existingSecret -}}
+        {{- printf "%s" .Values.mysql.auth.existingSecret -}}
+    {{- else -}}
+        {{- printf "%s" (include "mysql.fullname" .) -}}
+    {{- end -}}
+{{- else if .Values.externalDatabase.existingSecret -}}
+    {{- printf "%s" .Values.externalDatabase.existingSecret -}}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Create fully qualified database name

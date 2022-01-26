@@ -59,13 +59,16 @@ spec:
           volumeMounts:
             - name: mysql
               mountPath: /var/lib/mysql
-          readinessProbe:
-            exec:
-              command:
-                - bash
-                - "-c"
-                - |
-                  mysql -uroot -p$MYSQL_ROOT_PASSWORD -e 'SELECT 1'
+#          readinessProbe:
+#            exec:
+#              command:
+#                - bash
+#                - "-c"
+#                - |
+#                  mysql -uroot -p"$MYSQL_ROOT_PASSWORD" -e 'SELECT 1'
+#            initialDelaySeconds: 5
+#            periodSeconds: 2
+#            timeoutSeconds: 1
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       initContainers:

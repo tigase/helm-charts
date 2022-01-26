@@ -1,4 +1,4 @@
-{{- if .Values.mysql.backupVolume.enabled }}
+{{- if and .Values.mysql.enabled .Values.mysql.backupVolume.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -18,8 +18,8 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mysql.databaseSecretName" . }}
-                  key: password
+                  name: {{ include "onedev.databaseSecretName" . | quote }}
+                  key: mysql-root-password
             command:
             - /bin/sh
             - "-c"
@@ -63,7 +63,7 @@ spec:
           {{- end }}
 {{- end }}
 ---
-{{- if .Values.mysql.backupS3.enabled }}
+{{- if and .Values.mysql.enabled .Values.mysql.backupS3.enabled }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -83,8 +83,8 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "mysql.databaseSecretName" . }}
-                  key: password
+                  name: {{ include "agility-competitions.databaseSecretName" . | quote }}
+                  key: mysql-root-password
             - name: S3_ENDPOINT
               valueFrom:
                 secretKeyRef:
