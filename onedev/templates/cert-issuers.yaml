@@ -48,7 +48,7 @@ spec:
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
-    name: {{ .Values.ingress.certificateIssuer | (printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-") }}
+    name: {{ .Values.ingress.certificateIssuer | default (printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-") }}
   commonName: {{ (index .Values.ingress.tls.hosts 0) | quote }}
   dnsNames:
     {{- range .Values.ingress.tls.hosts }}

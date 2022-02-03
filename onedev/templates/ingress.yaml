@@ -22,7 +22,7 @@ metadata:
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-    cert-manager.io/cluster-issuer: {{  .Values.ingress.certificateIssuer | (printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-") }}
+    cert-manager.io/cluster-issuer: {{  .Values.ingress.certificateIssuer | default (printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-") }}
 #    kubernetes.io/tls-acme: "true"
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
