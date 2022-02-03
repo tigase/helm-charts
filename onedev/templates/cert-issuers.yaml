@@ -1,4 +1,5 @@
 {{- if .Values.ingress.enabled }}
+{{- if not .Values.ingress.certificateIssuer }}
 {{- if eq .Values.ingress.sslProvider "self-signed" }}
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -35,6 +36,7 @@ spec:
         ingress:
           class: nginx
 {{- end }}
+{{- end }}
 ---
 {{- if .Values.ingress.tls }}
 apiVersion: cert-manager.io/v1
@@ -46,7 +48,7 @@ spec:
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
-    name: {{ printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-" }}
+    name: {{ .Values.ingress.certificateIssuer | (printf "%s-cluster-issuer" (include "onedev.fullname" .) | trunc 63 | trimSuffix "-") }}
   commonName: {{ (index .Values.ingress.tls.hosts 0) | quote }}
   dnsNames:
     {{- range .Values.ingress.tls.hosts }}

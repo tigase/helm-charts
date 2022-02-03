@@ -120,6 +120,7 @@ ingress:
   ## - self-signed
   ## - letsencrypt
   sslProvider: "self-signed"
+  certificateIssuer: ""
   tls: 
   #  - secretName: chart-example-tls
   #    hosts:
