@@ -97,6 +97,18 @@ spec:
             mountPath: /backup
       {{- end }}
       {{- if .Values.backup.s3.enabled }}
+      {{- if .Values.backup.s3.forceRestore }}
+        - name: drop-data
+          image: perconalab/percona-xtrabackup:8.0.26-18
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              rm -rf /var/lib/mysql/*
+          volumeMounts:
+            - name: mysql
+              mountPath: /var/lib/mysql
+      {{- end }}      
         - name: init-s3-config
           image: minio/mc
           env:
@@ -168,6 +180,11 @@ spec:
               else
                 echo Database files already present.
               fi
+          volumeMounts:
+            - name: mysql
+              mountPath: /var/lib/mysql
+            - name: mysql-s3-config
+              mountPath: /s3-config
       {{- end }}       
       volumes:
         - name: mysql

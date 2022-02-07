@@ -47,6 +47,7 @@ backup:
     
   s3:
     enabled: false
+    forceRestore: false
     ## Cron job schedule
     schedule: ""
     endpoint: ""
