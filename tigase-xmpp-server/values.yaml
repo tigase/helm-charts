@@ -61,6 +61,11 @@ database:
   # ket of the secret containing password for the database user
   secretPasswordKey: "password"
 
+certificate:
+  generateWildcard: false
+  repository:
+    enabled: true
+
 service:
   type: LoadBalancer
   ports:
@@ -101,6 +106,9 @@ meet:
   # uri to access Janus from inside k8s cluster
   janusURI: "ws://janus:8188/"          
 
+users:
+  create: false
+
 sessMan:
   amp:
     threadsNo: ''
@@ -120,6 +128,8 @@ ingress:
   ## - self-signed
   ## - letsencrypt          
   sslProvider: "self-signed"
+  ## Name of the certificate issuer to use instead of sslProvider
+  sslCertificateIssuer: ""
   tls: 
   #   hosts:
   #     - chart-example.local

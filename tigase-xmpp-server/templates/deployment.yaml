@@ -91,10 +91,12 @@ spec:
                 secretKeyRef:
                   name: {{ include "tigase.databaseSecretName" . | quote }}
                   key: {{ .Values.database.secretPasswordKey | quote }}
+            {{- if .Values.fileUpload.enabled }}
             - name: HTTP_UPLOAD_DOMAIN
               value: {{ .Values.fileUpload.domain | quote }}
             - name: HTTP_UPLOAD_MAX_FILESIZE
               value: {{ .Values.fileUpload.maxFileSize | quote }}
+            {{- if eq .Values.fileUpload.storage "s3" }}
             - name: UPLOAD_S3_BUCKET
               value: {{ .Values.fileUpload.s3storage.bucket | quote }}
             - name: UPLOAD_S3_REGION
@@ -110,6 +112,8 @@ spec:
               value: {{ .Values.fileUpload.s3storage.pathStyleAccess | quote }}
             - name: UPLOAD_S3_ENDPOINT_URL
               value: {{ .Values.fileUpload.s3storage.endpointUrl | quote }}
+            {{- end }}
+            {{- end }}
             - name: INTERNAL_IP
               valueFrom:
                 fieldRef:
@@ -137,7 +141,7 @@ spec:
           {{- end }}
       initContainers:
       - name: init
-        image: busybox
+        image: busybox:1.28
         command: ["sh", "-c", "until nslookup {{ include "tigase.databaseHost" . }}; do echo waiting for database; sleep 2; done;"]            
       volumes:
       - name: config

@@ -46,7 +46,7 @@ spec:
   issuerRef:
     group: cert-manager.io
     kind: ClusterIssuer
-    name: {{ printf "%s-cluster-issuer" (include "tigase-xmpp-server.fullname" .) | trunc 63 | trimSuffix "-" }}
+    name: {{ .Values.ingress.sslCertificateIssuer | default (printf "%s-cluster-issuer" (include "tigase-xmpp-server.fullname" .) | trunc 63 | trimSuffix "-") }}
   commonName: {{ (index .Values.ingress.tls.hosts 0) | quote }}
   dnsNames:
     {{- range .Values.ingress.tls.hosts }}

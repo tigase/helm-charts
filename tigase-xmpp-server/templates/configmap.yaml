@@ -4,15 +4,24 @@ admins = env('ADMINS')
 'config-type' = '--gen-config-def'
 'default-virtual-host' = env('VHOST')
 'vhost-register-enabled' = true
-'hardened-mode' = secure
+{{- if .Values.hardenedMode }}
+'hardened-mode' = {{ .Values.hardenedMode }}
+{{- end }}
 trusted = [ 'http@{clusterNode}' ]
-
+{{- if .Values.debug }}
+debug = [ {{ join ", " .Values.debug }} ]
+{{- end }}
 dataSource {
     default () {
         uri = 'jdbc:' + env('DB_TYPE') + '://' + env('DB_HOST', 'localhost') + ':' + env('DB_PORT', '5432') + '/' + env('DB_NAME', 'kangaroo_tigasedb') + '?user=' + env('DB_USER', 'kangaroo_db_user') + '&password=' + env('DB_PASS', 'kangaroo_db_pass')
     }
 }
-
+{{- if .Values.certificate.repository.enabled }}
+'certificate-container' () {
+    generateWildcardCertificate = {{ .Values.certificate.generateWildcard }}
+    repository () {}
+}
+{{- end }}
 'dns-resolver' {
     'tigase-primary-address' = env('INTERNAL_IP')
     'tigase-secondary-address' = env('EXTERNAL_IP')
