@@ -14,7 +14,7 @@ spec:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
-                    matchExpression:
+                    matchExpressions:
                       - key: "app.kubernetes.io/instance"
                         operator: In
                         values:
@@ -79,7 +79,7 @@ spec:
             podAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
-                    matchExpression:
+                    matchExpressions:
                       - key: "app.kubernetes.io/instance"
                         operator: In
                         values:
