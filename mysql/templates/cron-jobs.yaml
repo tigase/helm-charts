@@ -11,13 +11,14 @@ spec:
       template:
         spec:
           affinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpression:
-                    - key: "app.kubernetes.io/instance"
-                      operator: In
-                      values:
-                        - {{ include "mysql.fullname" . | quote }}
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpression:
+                      - key: "app.kubernetes.io/instance"
+                        operator: In
+                        values:
+                          - {{ include "mysql.fullname" . | quote }}
           containers:
             - name: mysql-xtrabackup
               image: perconalab/percona-xtrabackup:8.0.26-18
@@ -75,13 +76,14 @@ spec:
       template:
         spec:
           affinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              - labelSelector:
-                  matchExpression:
-                    - key: "app.kubernetes.io/instance"
-                      operator: In
-                      values:
-                        - {{ include "mysql.fullname" . | quote }}
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpression:
+                      - key: "app.kubernetes.io/instance"
+                        operator: In
+                        values:
+                          - {{ include "mysql.fullname" . | quote }}
           containers:
             - name: mysql-xtrabackup
               image: perconalab/percona-xtrabackup:8.0.26-18

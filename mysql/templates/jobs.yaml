@@ -10,13 +10,14 @@ spec:
   template:
     spec:
       affinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpression:
-                - key: "app.kubernetes.io/instance"
-                  operator: In
-                  values:
-                    - {{ include "mysql.fullname" . | quote }}
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpression:
+                  - key: "app.kubernetes.io/instance"
+                    operator: In
+                    values:
+                      - {{ include "mysql.fullname" . | quote }}
       containers:
         - name: mysql-backup-s3-on-demand
           image: perconalab/percona-xtrabackup:8.0.26-18
