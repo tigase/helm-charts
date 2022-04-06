@@ -26,8 +26,8 @@ spec:
       serviceAccountName: {{ include "coturn.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+#      hostNetwork: true
+#      dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -53,6 +53,9 @@ spec:
             - name: turn-3478
               containerPort: 3478
               protocol: UDP
+            - name: turn-tcp-3478
+              containerPort: 3478
+              protocol: TCP
           {{- range $portRange }}
             - name: turn-{{ . }}
               containerPort: {{ . }}

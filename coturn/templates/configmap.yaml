@@ -17,7 +17,7 @@ data:
     no-tls
     no-dtls
     prod
-    no-tcp-relay
+    
     
     denied-peer-ip=0.0.0.0-0.255.255.255
     denied-peer-ip=10.0.0.0-10.255.255.255
