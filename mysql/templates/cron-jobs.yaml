@@ -19,6 +19,7 @@ spec:
                         operator: In
                         values:
                           - {{ include "mysql.fullname" . | quote }}
+                  topologyKey: "kubernetes.io/hostname" 
           containers:
             - name: mysql-xtrabackup
               image: perconalab/percona-xtrabackup:8.0.26-18
@@ -84,6 +85,7 @@ spec:
                         operator: In
                         values:
                           - {{ include "mysql.fullname" . | quote }}
+                  topologyKey: "kubernetes.io/hostname" 
           containers:
             - name: mysql-xtrabackup
               image: perconalab/percona-xtrabackup:8.0.26-18
