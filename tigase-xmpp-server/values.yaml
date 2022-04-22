@@ -113,6 +113,11 @@ sessMan:
   amp:
     threadsNo: ''
     
+additionalConfiguration: ''
+
+# external IP/domain name which should be used for accessing server from outside
+externalIP: ''
+    
 ingress:
   enabled: false
   className: ""

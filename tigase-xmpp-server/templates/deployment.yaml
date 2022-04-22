@@ -119,9 +119,13 @@ spec:
                 fieldRef:
                   fieldPath: status.podIP
             - name: EXTERNAL_IP
+            {{- if .Values.externalIP }}
+              value: {{ .Values.externalIP | quote }}
+            {{- else }}
               valueFrom:
                 fieldRef:
                   fieldPath: status.podIP
+            {{- end }}
             - name: VHOST
               value: {{ include "tigase.vhost" . | quote }}
             - name: ADMINS

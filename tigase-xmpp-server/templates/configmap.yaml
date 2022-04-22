@@ -130,7 +130,9 @@ upload (active: false) {}
 ws2s {
     seeOtherHost (active: false) {}
 }
-
+{{- if .Values.additionalConfiguration }}
+{{ print .Values.additionalConfiguration }}
+{{- end}}
 {{- end }}
 
 apiVersion: v1
