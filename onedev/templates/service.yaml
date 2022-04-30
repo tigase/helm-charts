@@ -5,6 +5,10 @@ metadata:
   labels:
     {{- include "onedev.labels" . | nindent 4 }}
     tier: server
+  annotations:
+  {{- with .Values.onedev.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.onedev.service.type }}
   ports:

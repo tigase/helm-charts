@@ -27,6 +27,7 @@ onedev:
     sizeLimit: ""
 
   service:
+    annotations: {}
     type: LoadBalancer
     httpPort: 80
     sshPort: 22
