@@ -67,6 +67,7 @@ certificate:
     enabled: true
 
 service:
+  annotations: {}
   type: LoadBalancer
   ports:
     c2s: 5222
