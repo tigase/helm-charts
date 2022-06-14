@@ -1,4 +1,4 @@
-{{- $portRange := untilStep (int .Values.ports.from) (int (add1 .Values.ports.to)) 1 -}}
+{{- $portRange := untilStep (int .Values.ports.from) (int .Values.ports.to) 1 -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -26,8 +26,11 @@ spec:
       serviceAccountName: {{ include "coturn.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-#      hostNetwork: true
-#      dnsPolicy: ClusterFirstWithHostNet
+        
+      {{- if .Values.hostNetwork }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -35,20 +38,26 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
+          - name: COTURN_USER
+            value: {{ .Values.secret.username | quote }}
           - name: COTURN_SECRET
+            {{- if .Values.secret.password }}
+            value: {{ .Values.secret.password | quote }}
+            {{- else }}
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.secret.name }}
                 key: {{ .Values.secret.key }}
+            {{- end }}
           - name: POD_IP
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
           args:
             - "--listening-ip=${POD_IP}"
-            - "--static-auth-secret=${COTURN_SECRET}"
-            - "--external-ip=$(detect-external-ip)"
-            - "--relay-ip=$(detect-external-ip)"
+            - "-u ${COTURN_USER}:${COTURN_SECRET}"
+            - "--external-ip=$(detect-external-ip)/${POD_IP}"
+#            - "--relay-ip=$(detect-external-ip)"
           ports:
             - name: turn-3478
               containerPort: 3478

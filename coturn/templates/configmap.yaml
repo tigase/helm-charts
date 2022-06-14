@@ -6,7 +6,6 @@ metadata:
     {{- include "coturn.labels" . | nindent 4 }}
 data:
   turnserver.conf: |
-    use-auth-secret
     realm={{ .Values.vhost }}
     min-port={{ .Values.ports.from }}
     max-port={{ .Values.ports.to }}

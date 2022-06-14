@@ -1,4 +1,5 @@
-{{- $portRange := untilStep (int .Values.ports.from) (int (add1 .Values.ports.to)) 1 -}}
+{{- if .Values.service.enabled }}
+{{- $portRange := untilStep (int .Values.ports.from) (int .Values.ports.to) 1 -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -24,3 +25,4 @@ spec:
     {{- end }}      
   selector:
     {{- include "coturn.selectorLabels" . | nindent 4 }}
+{{- end }}

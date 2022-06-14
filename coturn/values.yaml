@@ -21,6 +21,7 @@ ports:
   to: ""
 
 secret:
+  username: "coturn"
   name: ""
   key: ""
 
@@ -47,8 +48,11 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
+  enabled: true
   type: ClusterIP
   annotations: {}
+
+hostNetwork: false
 
 ingress:
   enabled: false
