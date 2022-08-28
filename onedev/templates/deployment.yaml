@@ -70,6 +70,8 @@ spec:
 #            path: /
 #            port: http
 #          initialDelaySeconds: 60
+        resources:
+          {{- toYaml .Values.onedev.resources | nindent 10 }}
         volumeMounts:
         - mountPath: "/opt/onedev"
           name: onedev              
