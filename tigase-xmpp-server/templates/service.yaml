@@ -15,29 +15,50 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.http }}
+      {{- end }}
     - port: {{ .Values.service.ports.bosh }}
       targetPort: xmpp-bosh
       protocol: TCP
       name: xmpp-bosh
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.bosh }}
+      {{- end }}
     - port: {{ .Values.service.ports.c2s }}
       targetPort: xmpp-c2s
       protocol: TCP
       name: xmpp-c2s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.c2s }}
+      {{- end }}
     - port: {{ .Values.service.ports.cs2s }}
       targetPort: xmpp-cs2s
       protocol: TCP
       name: xmpp-cs2s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.cs2s }}
+      {{- end }}
     - port: {{ .Values.service.ports.ws2s }}
       targetPort: xmpp-ws2s
       protocol: TCP
       name: xmpp-ws2s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.ws2s }}
+      {{- end }}
     - port: {{ .Values.service.ports.wss2s }}
       targetPort: xmpp-wss2s
       protocol: TCP
       name: xmpp-wss2s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.wss2s }}
+      {{- end }}
     - port: {{ .Values.service.ports.s2s }}
       targetPort: xmpp-s2s
       protocol: TCP
       name: xmpp-s2s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.s2s }}
+      {{- end }}
   selector:
     {{- include "tigase-xmpp-server.selectorLabels" . | nindent 4 }}
