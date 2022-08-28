@@ -16,10 +16,16 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if eq .Values.onedev.service.type "NodePort" }}
+      nodePort: {{ .Values.onedev.service.httpPort }}
+      {{- end }}
     - port: {{ .Values.onedev.service.sshPort }}
       targetPort: ssh
       protocol: TCP
       name: ssh
+      {{- if eq .Values.onedev.service.type "NodePort" }}
+      nodePort: {{ .Values.onedev.service.sshPort }}
+      {{- end }}
   selector:
     {{- include "onedev.selectorLabels" . | nindent 4 }}
     tier: server
