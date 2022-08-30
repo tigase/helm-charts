@@ -25,7 +25,7 @@ spec:
       targetPort: {{ . }}
       protocol: UDP
       name: turn-{{ . }}
-      {{- if eq .Values.service.type "NodePort" }}
+      {{- if eq $.Values.service.type "NodePort" }}
       nodePort: {{ . }}
       {{- end }}
     {{- end }}      
