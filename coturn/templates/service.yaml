@@ -17,11 +17,17 @@ spec:
       targetPort: turn-3478
       protocol: UDP
       name: turn-3478
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 3478
+      {{- end }}
     {{- range $portRange }}
     - port: {{ . }}
       targetPort: {{ . }}
       protocol: UDP
       name: turn-{{ . }}
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ . }}
+      {{- end }}
     {{- end }}      
   selector:
     {{- include "coturn.selectorLabels" . | nindent 4 }}
