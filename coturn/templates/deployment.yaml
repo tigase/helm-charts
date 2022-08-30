@@ -62,14 +62,23 @@ spec:
             - name: turn-3478
               containerPort: 3478
               protocol: UDP
+              {{- if $.Values.hostPort }}
+              hostPort: 3478
+              {{- end }}
             - name: turn-tcp-3478
               containerPort: 3478
               protocol: TCP
+              {{- if $.Values.hostPort }}
+              hostPort: 3478
+              {{- end }}
           {{- range $portRange }}
             - name: turn-{{ . }}
               containerPort: {{ . }}
               hostPort: {{ . }}
               protocol: UDP
+              {{- if $.Values.hostPort }}
+              hostPort: {{ . }}
+              {{- end }}
           {{- end }}
           volumeMounts:
             - name: coturn-config
