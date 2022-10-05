@@ -48,6 +48,12 @@ ingress:
       paths:
         - path: /
           pathType: ImplementationSpecific
+          serviceType: "killbill"
+    - host: kaui
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          serviceType: "kaui"
   ## Name of the SSL certificate provider to use from:
   ## - self-signed
   ## - letsencrypt
