@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "killbill.fullname" . }}
+  labels:
+    {{- include "killbill.labels" . | nindent 4 }}
+    tier: server
+  annotations:
+  {{- with .Values.killbill.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.killbill.service.type }}
+  ports:
+    - port: {{ .Values.killbill.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+      {{- if eq .Values.killbill.service.type "NodePort" }}
+      nodePort: {{ .Values.killbill.service.port }}
+      {{- end }}
+  selector:
+    {{- include "killbill.selectorLabels" . | nindent 4 }}
+    tier: server
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "kaui.fullname" . }}
+  labels:
+    {{- include "kaui.labels" . | nindent 4 }}
+    tier: server
+  annotations:
+  {{- with .Values.kaui.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.kaui.service.type }}
+  ports:
+    - port: {{ .Values.kaui.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+      {{- if eq .Values.kaui.service.type "NodePort" }}
+      nodePort: {{ .Values.kaui.service.port }}
+      {{- end }}
+  selector:
+    {{- include "kaui.selectorLabels" . | nindent 4 }}
+    tier: server

@@ -1,0 +1,125 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "killbill.fullname" . }}
+  labels:
+    {{- include "killbill.labels" . | nindent 4 }}
+    tier: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "killbill.selectorLabels" . | nindent 6 }}
+      tier: server
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "killbill.selectorLabels" . | nindent 8 }}
+        tier: server
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{/*      serviceAccountName: {{ include "killbill.serviceAccountName" . }}*/}}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.killbill.image.repository }}:{{ .Values.killbill.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.killbill.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KILLBILL_DAO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: "mysql-root-password"
+                  name: {{ include "killbill.databaseSecretName" . }}
+            - name: KILLBILL_DAO_URL
+              value: {{ include "killbill.databaseUrl" . | quote }}
+            - name: KILLBILL_DAO_USER
+              value: "root"
+          resources:
+          {{- toYaml .Values.killbill.resources | nindent 10 }}
+      restartPolicy: Always
+      {{- with .Values.killbill.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.killbill.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "kaui.fullname" . }}
+  labels:
+    {{- include "kaui.labels" . | nindent 4 }}
+    tier: server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "kaui.selectorLabels" . | nindent 6 }}
+      tier: server
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "kaui.selectorLabels" . | nindent 8 }}
+        tier: server
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{/*      serviceAccountName: {{ include "killbill.serviceAccountName" . }}*/}}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ include "kaui.fullname" . }}
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.kaui.image.repository }}:{{ .Values.kaui.image.tag }}"
+          imagePullPolicy: {{ .Values.kaui.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KAUI_CONFIG_DAO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: "mysql-root-password"
+                  name: {{ include "killbill.databaseSecretName" . }}
+            - name: KAUI_CONFIG_DAO_URL
+              value: {{ include "killbill.databaseUrl" . | quote }}
+            - name: KAUI_CONFIG_DAO_USER
+              value: "root"
+            - name: KAUI_KILLBILL_URL
+              value: {{ include "killbill.url" . }}
+          resources:
+          {{- toYaml .Values.killbill.resources | nindent 10 }}
+      restartPolicy: Always
+      {{- with .Values.killbill.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.killbill.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
