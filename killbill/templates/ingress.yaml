@@ -48,11 +48,11 @@ spec:
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
-                name: {{ include ( printf "%s.fullname" .serviceType ) . }}
+                name: {{ include ( printf "%s.fullname" .serviceType ) $ }}
                 port:
                   number: 8080
               {{- else }}
-              serviceName: {{ include ( printf "%s.fullname" .serviceType ) . }}
+              serviceName: {{ include ( printf "%s.fullname" .serviceType ) $ }}
               servicePort: 8080
               {{- end }}
           {{- end }}

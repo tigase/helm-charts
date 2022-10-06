@@ -49,7 +49,7 @@ spec:
             - name: KILLBILL_DAO_USER
               value: "root"
           resources:
-          {{- toYaml .Values.killbill.resources | nindent 10 }}
+          {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always
       {{- with .Values.killbill.affinity }}
       affinity:
@@ -113,7 +113,7 @@ spec:
             - name: KAUI_KILLBILL_URL
               value: {{ include "killbill.url" . }}
           resources:
-          {{- toYaml .Values.killbill.resources | nindent 10 }}
+            {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always
       {{- with .Values.killbill.affinity }}
       affinity:
