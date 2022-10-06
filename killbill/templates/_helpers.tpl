@@ -105,10 +105,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "killbill.databaseName" -}}
-  {{- printf "%s" .Values.database.database -}}
-{{- end -}}
-
-{{- define "killbill.databaseName" -}}
 {{- printf "%s" .Values.database.killbill -}}
 {{- end -}}
 
