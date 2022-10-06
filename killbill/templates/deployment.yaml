@@ -148,7 +148,7 @@ spec:
                   key: "mysql-root-password"
                   name: {{ include "killbill.databaseSecretName" . }}
             - name: KAUI_CONFIG_DAO_URL
-              value: {{ include "killbill.databaseUrl" . | quote }}
+              value: {{ include "kaui.databaseUrl" . | quote }}
             - name: KAUI_CONFIG_DAO_USER
               value: "root"
             - name: KAUI_KILLBILL_URL
