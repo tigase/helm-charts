@@ -113,7 +113,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
 {{- define "killbill.databaseUrl" -}}
-  {{- printf "jdbc:mysql://%s:%s/%s" (include "killbill.databaseHost" .) (include "killbill.databasePort" .) (include "killbill.databaseName" .) -}}
+  {{- printf "jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true" (include "killbill.databaseHost" .) (include "killbill.databasePort" .) (include "killbill.databaseName" .) -}}
 {{- end -}}
 
 {{- define "killbill.url" -}}
