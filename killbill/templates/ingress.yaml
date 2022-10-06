@@ -17,12 +17,12 @@ kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+    {{- include "killbill.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
-    cert-manager.io/cluster-issuer: {{ printf "%s-cluster-issuer" (include "tigase-xmpp-server.fullname" .) | trunc 63 | trimSuffix "-" }}
+    cert-manager.io/cluster-issuer: {{ printf "%s-cluster-issuer" (include "killbill.fullname" .) | trunc 63 | trimSuffix "-" }}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}
