@@ -35,7 +35,8 @@ kaui:
 database:
   host: mysql
   port: 3306
-  database: "killbill"
+  killbill: "killbill"
+  kaui: "kaui"
   existingSecret: ""
 
 ingress:

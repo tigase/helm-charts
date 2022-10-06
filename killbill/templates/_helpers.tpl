@@ -108,12 +108,24 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- printf "%s" .Values.database.database -}}
 {{- end -}}
 
+{{- define "killbill.databaseName" -}}
+{{- printf "%s" .Values.database.killbill -}}
+{{- end -}}
+
 {{- define "killbill.databaseSecretName" -}}
   {{- printf "%s" .Values.database.existingSecret -}}
 {{- end -}}
 
+{{- define "kaui.databaseName" -}}
+{{- printf "%s" .Values.database.kaui -}}
+{{- end -}}
+
 {{- define "killbill.databaseUrl" -}}
   {{- printf "jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true" (include "killbill.databaseHost" .) (include "killbill.databasePort" .) (include "killbill.databaseName" .) -}}
+{{- end -}}
+
+{{- define "kaui.databaseUrl" -}}
+  {{- printf "jdbc:mysql://%s:%s/%s?allowPublicKeyRetrieval=true" (include "killbill.databaseHost" .) (include "killbill.databasePort" .) (include "kaui.databaseName" .) -}}
 {{- end -}}
 
 {{- define "killbill.url" -}}
