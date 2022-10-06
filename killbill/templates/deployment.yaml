@@ -35,10 +35,10 @@ spec:
             - /bin/sh
             - "-c"
             - |
-              echo "CREATE DATABASE IF NOT EXISTS `killbill`;" >> /schema/killbill-ddl.sql
-              echo "USE killbill;" >> /schema/killbill-ddl.sql
-              echo "CREATE DATABASE IF NOT EXISTS `kaui`;" >> /schema/kaiu-ddl.sql
-              echo "USE kaui;" >> /schema/kaui-ddl.sql
+              echo 'CREATE DATABASE IF NOT EXISTS `killbill`;' >> /schema/killbill-ddl.sql
+              echo 'USE killbill;' >> /schema/killbill-ddl.sql
+              echo 'CREATE DATABASE IF NOT EXISTS `kaui`;' >> /schema/kaiu-ddl.sql
+              echo 'USE kaui;' >> /schema/kaui-ddl.sql
               wget http://docs.killbill.io/{{ .Values.killbill.version }}/ddl.sql -O - >> /schema/killbill-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-admin-ui/master/db/ddl.sql -O - >> /schema/kaiu-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-stripe-plugin/master/src/main/resources/ddl.sql -O - >> /schema/killbill-ddl.sql
