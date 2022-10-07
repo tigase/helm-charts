@@ -135,3 +135,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   {{- printf "http://%s:%d" (index .Values.ingress.hosts 0).host .Values.killbill.service.port -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "killbill.internalUrl" -}}
+  {{- printf "http://%s:%d" (printf "killbill.fullname" .) .Values.killbill.service.port -}}
+{{- end -}}
