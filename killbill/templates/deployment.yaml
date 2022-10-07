@@ -152,7 +152,7 @@ spec:
             - name: KAUI_CONFIG_DAO_USER
               value: "root"
             - name: KAUI_KILLBILL_URL
-              value: {{ include "killbill.internalUrl" . }}
+              value: {{ include "killbill.internalUrl" . | quote }}
           resources:
             {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always
