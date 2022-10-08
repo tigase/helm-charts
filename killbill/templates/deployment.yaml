@@ -49,7 +49,6 @@ spec:
           volumeMounts:
             - mountPath: /schema
               name: schema
-        {{- if .Values.load }}
         - name: load-schema
           image: mysql:8.0.27
           env:
