@@ -69,6 +69,12 @@ spec:
       volumes:
         - name: schema
           emptyDir: {}
+        - name: config
+          configMap:
+            name: {{ include "killbill.fullname" . }}-config
+            items:
+              - key: shiro.ini
+                path: shiro.ini
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -89,6 +95,9 @@ spec:
               value: {{ include "killbill.databaseUrl" . | quote }}
             - name: KILLBILL_DAO_USER
               value: "root"
+          volumeMounts:
+            - mountPath: /var/lib/killbill/config
+              name: config
           resources:
           {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always
@@ -153,6 +162,8 @@ spec:
               value: "root"
             - name: KAUI_KILLBILL_URL
               value: {{ include "killbill.internalUrl" . | quote }}
+            - name: KAUI_ROOT_USERNAME
+              value: {{ .Values.kaui.rootUser | quote }}
           resources:
             {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always

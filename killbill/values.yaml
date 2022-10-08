@@ -10,6 +10,8 @@ killbill:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
+
+  enableAdminUser: false
     
   resources: {}
   affinity: {}
@@ -25,7 +27,9 @@ kaui:
   image:
     repository: killbill/kaui
     pullPolicy: IfNotPresent
-    tag: "2.0.9"
+    tag: "2.0.11"
+
+  rootUser: "admin"
 
   service:
     annotations: {}

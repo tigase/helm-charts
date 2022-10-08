@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "killbill.fullname" . }}-config
+  labels:
+    {{- include "killbill.labels" . | nindent 4 }}
+data:
+  shiro.ini: |
+    [users]
+    {{- if .Values.killbill.enableAdminUser -}}
+    admin = password, root
+    {{- end -}}
+    [roles]
+    root = *:*
+    
