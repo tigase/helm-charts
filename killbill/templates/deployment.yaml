@@ -49,6 +49,7 @@ spec:
           volumeMounts:
             - mountPath: /schema
               name: schema
+        {{- if .Values.load }}
         - name: load-schema
           image: mysql:8.0.27
           env:
@@ -63,6 +64,7 @@ spec:
             - |
               mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }}  < /schema/killbill-ddl.sql
               mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }}  < /schema/kaui-ddl.sql
+              echo 'Database schemas loaded!'
           volumeMounts:
             - mountPath: /schema
               name: schema
