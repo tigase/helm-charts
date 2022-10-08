@@ -28,6 +28,7 @@ spec:
 {{/*      serviceAccountName: {{ include "killbill.serviceAccountName" . }}*/}}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- if .Values.database.loadSchema }}
       initContainers:
         - name: download-schema
           image: busybox
@@ -35,9 +36,9 @@ spec:
             - /bin/sh
             - "-c"
             - |
-              echo 'CREATE DATABASE `{{ include "killbill.databaseName" . }}`;' >> /schema/killbill-ddl.sql
+              echo 'CREATE DATABASE IF NOT EXISTS `{{ include "killbill.databaseName" . }}`;' >> /schema/killbill-ddl.sql
               echo 'USE killbill;' >> /schema/killbill-ddl.sql
-              echo 'CREATE DATABASE `{{ include "kaui.databaseName" . }}`;' >> /schema/kaui-ddl.sql
+              echo 'CREATE DATABASE IF NOT EXISTS `{{ include "kaui.databaseName" . }}`;' >> /schema/kaui-ddl.sql
               echo 'USE kaui;' >> /schema/kaui-ddl.sql
               wget http://docs.killbill.io/{{ .Values.killbill.version }}/ddl.sql -O - >> /schema/killbill-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-admin-ui/master/db/ddl.sql -O - >> /schema/kaui-ddl.sql
@@ -67,6 +68,7 @@ spec:
           volumeMounts:
             - mountPath: /schema
               name: schema
+      {{- end }}
       volumes:
         - name: schema
           emptyDir: {}
