@@ -7,9 +7,9 @@ metadata:
 data:
   shiro.ini: |
     [users]
-    {{- if .Values.killbill.enableAdminUser -}}
+    {{- if .Values.killbill.enableAdminUser }}
     admin = password, root
-    {{- end -}}
+    {{- end }}
     [roles]
     root = *:*
     
