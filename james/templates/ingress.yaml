@@ -1,0 +1,46 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "james.fullname" . -}}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $fullName }}
+  labels:
+    {{- include "james.labels" . | nindent 4 }}
+  annotations:
+    {{- if and .Values.auth.username .Values.auth.password }}
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: {{ $fullName }}-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - James'
+    {{- end }}
+    {{- with .Values.ingress.annotations }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    cert-manager.io/cluster-issuer: {{ printf "%s-cluster-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+spec:
+  {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- end }}
+  {{- if .Values.ingress.tls }}
+  tls:
+    - hosts:
+      {{- range .Values.ingress.tls.hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ $fullName }}
+  {{- end }}
+  rules:
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ .path }}
+            pathType: {{ .pathType }}
+            backend:
+              service:
+                name: {{ $fullName }}-http
+                port:
+                  name: http-admin
+          {{- end }}
+    {{- end }}
+{{- end }}

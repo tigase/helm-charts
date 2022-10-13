@@ -1,0 +1,12 @@
+kind: ConfigMap
+metadata:
+  name: {{ include "james.fullname" . }}-config-props
+apiVersion: v1
+data:
+  james-database.properties: |-
+    database.driverClassName=com.mysql.cj.jdbc.Driver
+    database.url=jdbc:mysql://{{ include "james.databaseHost" . }}/{{ include "james.databaseName" . }}?allowPublicKeyRetrieval=true
+    database.username={{ include "james.databaseUsername" . }}
+    database.password={{ include "james.databasePassword" . }}
+
+    openjpa.streaming=false

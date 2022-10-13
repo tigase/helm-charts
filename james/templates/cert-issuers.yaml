@@ -1,0 +1,58 @@
+{{- if .Values.ingress.enabled }}
+{{- if not .Values.ingress.certificateIssuer }}
+{{- if eq .Values.ingress.sslProvider "self-signed" }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ printf "%s-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ printf "%s-cluster-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+spec:
+  selfSigned: {}
+{{- end }}
+{{- if eq .Values.ingress.sslProvider "letsencrypt" }}
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: {{ printf "%s-cluster-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+spec:
+  acme:
+    # You must replace this email address with your own.
+    # Let's Encrypt will use this to contact you about expiring
+    # certificates, and issues related to your account.
+    email: {{ .Values.ingress.acme.email }}
+    server: {{ default "https://acme-staging-v02.api.letsencrypt.org/directory" .Values.ingress.acme.server }}
+    privateKeySecretRef:
+      # Secret resource that will be used to store the account's private key.
+      name: {{ printf "%s-issuer-account-key" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+    # Add a single challenge solver, HTTP01 using nginx
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
+{{- end }}
+{{- end }}
+---
+{{- if .Values.ingress.tls }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{ include "james.fullname" . }}
+spec:
+  secretName: {{ include "james.fullname" . }}
+  issuerRef:
+    group: cert-manager.io
+    kind: ClusterIssuer
+    name: {{ .Values.ingress.certificateIssuer | default (printf "%s-cluster-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-") }}
+  commonName: {{ (index .Values.ingress.tls.hosts 0) | quote }}
+  dnsNames:
+    {{- range .Values.ingress.tls.hosts }}
+    - {{ . | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}

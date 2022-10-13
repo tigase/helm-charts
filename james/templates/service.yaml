@@ -1,0 +1,99 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "james.fullname" . }}-mail
+  labels:
+    {{- include "james.labels" . | nindent 4 }}
+  annotations:
+  {{- with .Values.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- if .Values.service.ports.smtp }}
+    - port: 25
+      targetPort: smtp
+      protocol: TCP
+      name: smtp
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 25
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.smtps }}
+    - port: 465
+      targetPort: smtps
+      protocol: TCP
+      name: smtps
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 465
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.smtps }}
+    - port: 587
+      targetPort: smtp-starttls
+      protocol: TCP
+      name: smtp-starttls
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 587
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.pop3 }}
+    - port: 110
+      targetPort: pop3
+      protocol: TCP
+      name: pop3
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 110
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.pop3s }}
+    - port: 995
+      targetPort: pop3s
+      protocol: TCP
+      name: pop3s
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 995
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.imap }}
+    - port: 143
+      targetPort: imap
+      protocol: TCP
+      name: imap
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 143
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.imaps }}
+    - port: 993
+      targetPort: imaps
+      protocol: TCP
+      name: imaps
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: 993
+      {{- end }}
+    {{- end }}
+  selector:
+    {{- include "james.selectorLabels" . | nindent 4 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "james.fullname" . }}-http
+  labels:
+    {{- include "james.labels" . | nindent 4 }}
+  annotations:
+  {{- with .Values.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http-admin
+      name: http-admin
+      protocol: TCP
+  selector:
+    {{- include "james.selectorLabels" . | nindent 4 }}
+
