@@ -51,6 +51,9 @@ spec:
           volumeMounts:
             - mountPath: /root/conf
               name: james-config-data
+        {{- with .Values.initContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:

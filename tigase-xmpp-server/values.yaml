@@ -118,7 +118,9 @@ additionalConfiguration: ''
 
 # external IP/domain name which should be used for accessing server from outside
 externalIP: ''
-    
+
+initContainers: []
+
 ingress:
   enabled: false
   className: ""

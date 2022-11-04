@@ -73,6 +73,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
+initContainers: []
+
 podAnnotations: {}
 
 podSecurityContext: {}

@@ -144,9 +144,12 @@ spec:
             name: upload-data
           {{- end }}
       initContainers:
-      - name: init
-        image: busybox:1.28
-        command: ["sh", "-c", "until nslookup {{ include "tigase.databaseHost" . }}; do echo waiting for database; sleep 2; done;"]            
+        - name: init
+          image: busybox:1.28
+          command: ["sh", "-c", "until nslookup {{ include "tigase.databaseHost" . }}; do echo waiting for database; sleep 2; done;"]
+        {{- with .Values.initContainers }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       volumes:
       - name: config
         configMap:
