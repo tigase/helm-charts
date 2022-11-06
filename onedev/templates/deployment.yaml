@@ -77,7 +77,7 @@ spec:
           name: onedev              
       initContainers:
         - name: init
-          image: busybox
+          image: busybox:1.28
           command: ["sh", "-c", "until nslookup {{ include "onedev.databaseHost" . }}; do echo waiting for mysql; sleep 2; done;"]
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
