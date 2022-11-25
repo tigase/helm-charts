@@ -15,7 +15,7 @@ metadata:
     {{- with .Values.ingress.annotations }}
       {{- toYaml . | nindent 4 }}
     {{- end }}
-    cert-manager.io/cluster-issuer: {{ printf "%s-cluster-issuer" (include "james.fullname" .) | trunc 63 | trimSuffix "-" }}
+    cert-manager.io/cluster-issuer: {{ .Values.ingress.certificateIssuer | default (printf "%s-cluster-issuer" (include "james.fullname" .)) | trunc 63 | trimSuffix "-" }}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}

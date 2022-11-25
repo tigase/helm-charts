@@ -64,10 +64,14 @@ spec:
             - name: ADMIN_JID
               value: {{ join "," .Values.users.jids | quote }}
             - name: ADMIN_PASSWORD
+              {{- if .Values.users.password }}
+              value: {{ .Values.users.password | quote }}
+              {{- else }}
               valueFrom:
                 secretKeyRef:
                   name: {{ .Values.users.secret | quote }}
                   key: "password"
+              {{- end }}
             {{- end }}
             - name: DB_TYPE
               value: {{ include "tigase.databaseType" . | quote }}

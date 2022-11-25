@@ -34,6 +34,9 @@ c2s {
     seeOtherHost (active: false) {}
 }
 http () {
+    {{- if .Values.rest.openAccess }}
+    'open-access' = true
+    {{- end }}
     'dns-webservice' () {}
     index () {}
     rest {}

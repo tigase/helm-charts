@@ -107,8 +107,14 @@ meet:
   # uri to access Janus from inside k8s cluster
   janusURI: "ws://janus:8188/"          
 
+rest:
+  openAccess: false
+
 users:
   create: false
+  jids: []
+  password: ''
+  secret: ''
 
 sessMan:
   amp:
