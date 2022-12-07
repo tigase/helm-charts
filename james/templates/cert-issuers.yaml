@@ -1,5 +1,4 @@
-{{- if .Values.ingress.enabled }}
-{{- if not .Values.ingress.certificateIssuer }}
+{{- if and .Values.ingress.enabled (not .Values.ingress.certificateIssuer) }}
 {{- if eq .Values.ingress.sslProvider "self-signed" }}
 apiVersion: cert-manager.io/v1
 kind: Issuer
@@ -35,7 +34,6 @@ spec:
       - http01:
           ingress:
             class: nginx
-{{- end }}
 {{- end }}
 ---
 {{- if .Values.ingress.tls }}
