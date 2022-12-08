@@ -26,6 +26,13 @@ onedev:
     ## Max size of a volume to use
     sizeLimit: ""
 
+  init: {}
+#    user:
+#      username: ""
+#      password: ""
+#      email: ""
+#    serverUrl: ""
+    
   maintenance: false
 
   service:
