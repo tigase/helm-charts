@@ -11,6 +11,8 @@ spec:
     matchLabels:
       {{- include "onedev.selectorLabels" . | nindent 6 }}
       tier: server
+  strategy:
+    type: Recreate
   template:
     metadata:
       {{- with .Values.podAnnotations }}
