@@ -1,0 +1,89 @@
+{{- if .Values.certificate.refresh.enabled }}
+{{- $root := . }}
+{{- range $domain := .Values.certificate.domains -}}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ printf "%s-%s-init-cert" (include "tigase-xmpp-server.fullname" $root) (regexReplaceAll "\\." $domain "-") | trunc 63 | trimSuffix "-"  }}
+spec:
+  template:
+    spec:
+      containers:
+        - name: cert-uploader
+          image: curlimages/curl:7.87.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: TIGASE_SERVICE
+              value: {{ include "tigase-xmpp-server.fullname" $root | quote }}
+            - name: DOMAIN
+              value: {{ $domain }}
+            {{- if $root.Values.certificate.refresh.apiKey }}
+            - name: API_KEY
+              value: {{ $root.Values.certificate.refresh.apiKey | quote }}
+            {{- end }}
+            {{- if and $root.Values.certificate.refresh.user $root.Values.certificate.refresh.password }}
+            - name: USER
+              value: {{ $root.Values.certificate.refresh.user | quote }}
+            - name: PASS
+              value: {{ $root.Values.certificate.refresh.password | quote }}
+             {{- end}}
+          command:
+            - /bin/sh
+            - "-c"
+            - |
+              cd /home/curl_user
+              if [ ! -z ${API_KEY+x} ]; then
+                API_KEY="?api-key=${API_KEY}"
+              else
+                API_KEY=""
+              fi
+              AUTH=""
+              if [ ! -z ${USER+x} ]; then
+                AUTH="--user ${USER}:${PASS} "
+              fi
+
+              curl -s https://letsencrypt.org/certs/isrgrootx1.pem --output isrgrootx1.pem
+              domain="$DOMAIN"
+              if test -f "$domain.pem"; then
+                rm "$domain.pem"
+              fi
+              certDir="/data/$domain"
+              cert=`cat $certDir/tls.key $certDir/tls.crt isrgrootx1.pem`
+              REQUEST="<command>
+              <node>ssl-certificate-add</node>
+              <fields>
+                <item>
+                  <var>Certificate in PEM format</var>
+                  <value>${cert}</value>
+                </item>
+                <item>
+                  <var>command-marker</var>
+                  <value>command-marker</value>
+                </item>
+                <item>
+                  <var>VHost</var>
+                  <value>${domain}</value>
+                </item>
+                <item>
+                  <var>Save permanently (to disk or repository)</var>
+                  <value>true</value>
+                </item>
+              </fields>
+              </command>"
+              RESPONSE=`curl -s -L -H "Content-Type: text/xml" -X POST ${AUTH} http://${TIGASE_SERVICE}:8080/rest/adhoc/vhost-man@${domain}${API_KEY} -d "${REQUEST}"`
+              if [[ ! ${RESPONSE} = *"loaded successfully"* ]]; then
+                echo -e "Server returned error while updating ${domain} certificate: \n ${RESPONSE}"
+              else
+                echo "Correctly updated certificate for ${domain}"
+              fi
+          volumeMounts:
+            - name: {{ regexReplaceAll "\\." $domain "-" }}
+              mountPath: /data/{{ $domain }}
+      volumes:
+        - name: {{ regexReplaceAll "\\." $domain "-" }}
+          secret:
+            secretName: {{ $domain }}
+      restartPolicy: Never
+  backoffLimit: 10
+{{- end }}
+{{- end }}

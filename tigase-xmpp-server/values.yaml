@@ -62,6 +62,17 @@ database:
   secretPasswordKey: "password"
 
 certificate:
+  refresh:
+    enabled: false
+    apiKey: ""
+    user: ""
+    password: ""
+    schedule: "0 */3 * * *"
+  subdomains:
+    - mix
+    - muc
+    - pubsub
+  domains: []
   generateWildcard: false
   repository:
     enabled: true
