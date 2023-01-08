@@ -20,4 +20,5 @@ spec:
     {{- range $subdomain := $subdomains }}
     - {{ $subdomain }}.{{ $domain }}
     {{- end }}
+---
 {{- end }}

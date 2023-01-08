@@ -85,5 +85,6 @@ spec:
             secretName: {{ $domain }}
       restartPolicy: Never
   backoffLimit: 10
+---
 {{- end }}
 {{- end }}
