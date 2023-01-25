@@ -11,6 +11,12 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
 
+disableEnterpriseCheck: false
+
+# If you are enabling clusering, please be sure to use Tigase XMPP Server enterprise version as it is required.
+clustering:
+  enabled: false
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -115,6 +121,7 @@ fileUpload:
 
 # Configuration for Tigase Meet        
 meet:
+  enabled: false
   # uri to access Janus from inside k8s cluster
   janusURI: "ws://janus:8188/"          
 

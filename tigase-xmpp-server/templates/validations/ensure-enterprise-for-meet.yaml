@@ -1,0 +1,5 @@
+{{- if and .Values.meet.enabled (not .Values.disableEnterpriseCheck) -}}
+  {{- if not (hasSuffix "-enterprise" .Values.image.tag) -}}
+    {{- fail "Usage of non-enterprise image with Tigase Meet enabled!\nEnabling Tigase Meet requires usage of enterprise features available only in enterprise images (non-FOSS, with `-enterprise` suffix).\nIf you are sure, that the image you are trying to use contains Tigase Meet, please set `disableEnterpriseCheck` to `true`." }}
+  {{- end -}}
+{{- end -}}

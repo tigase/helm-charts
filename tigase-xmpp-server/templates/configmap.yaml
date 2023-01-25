@@ -1,6 +1,6 @@
 {{- define "config" }}
 admins = env('ADMINS')
-'cluster-mode' = true
+'cluster-mode' = {{ .Values.clustering.enabled }}
 'config-type' = '--gen-config-def'
 'default-virtual-host' = env('VHOST')
 'vhost-register-enabled' = true
@@ -55,18 +55,24 @@ httpServer (class: tigase.http.jetty.JettyStandaloneHttpServer) {
 'message-router' () {
     'detailed-memory-statistics' = true
 }
+{{- if .Values.meet.enabled }}
 meet () {
     uri = env('JANUS_URI')
 }
+{{- end }}
 muc () {
     'message-filter-enabled' = false
     'ping-every-minute' = true
+    {{- if .Values.clustering.enabled }}
     strategy (class: tigase.muc.cluster.ClusteredRoomStrategyV2) {}
+    {{- end }}
 }
 pubsub () {
     'persistent-pep' = true
     'send-last-published-item-on-presence' = true
+    {{- if .Values.clustering.enabled }}
     strategy (class: tigase.pubsub.cluster.ClusteredNodeStrategy) {}
+    {{- end }}
 }
 'sess-man' {
     amp () {
@@ -88,7 +94,9 @@ pubsub () {
     'message-archive-xep-0136' () {}
     'message-carbons' () {}
     'jabber:iq:register' () {}
+    {{- if .Values.clustering.enabled }}
     strategy (class: tigase.server.cluster.strategy.OnlineUsersCachingStrategy) {}
+    {{- end }}
     'urn:xmpp:mam:1' () {}
     'urn:xmpp:mix:pam:2' () {}
     'urn:xmpp:push:0' () {
