@@ -25,31 +25,18 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
-        - name: download-jdbc-driver
-          image: busybox
-          command:
-            - /bin/sh
-            - "-c"
-            - |
-              if [ ! -f /root/libs/mysql-connector-java-8.0.30.jar ]; then
-                echo "Downloading MySQL JDBC driver..."
-                wget https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.30/mysql-connector-java-8.0.30.jar -O - > /root/libs/mysql-connector-java-8.0.30.jar
-              fi
-          volumeMounts:
-            - mountPath: /root/libs
-              name: james-jdbc-driver
         - name: init-keystore
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           command:
             - /bin/sh
             - "-c"
             - |
-              if [ ! -f /root/conf/keystore ]; then
+              if [ ! -f /root/secrets/keystore ]; then
                 echo "Generating keystore...";
-                keytool -genkey -alias james -dname "CN=james" -keyalg RSA -storepass james72laBalle -keystore /root/conf/keystore
+                keytool -genkey -alias james -dname "CN=james" -keyalg RSA -storepass james72laBalle -keystore /root/secrets/keystore
               fi
           volumeMounts:
-            - mountPath: /root/conf
+            - mountPath: /root/secrets
               name: james-config-data
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}
@@ -90,17 +77,20 @@ spec:
               mountPath: /root/conf/james-database.properties
               subPath: james-database.properties
             - name: james-config-data
-              mountPath: /root/conf/keystore
+              mountPath: /root/secrets/keystore
               subPath: keystore
-            - name: james-jdbc-driver
-              mountPath: /root/libs/mysql-connector-java-8.0.30.jar
-              subPath: mysql-connector-java-8.0.30.jar
+            - name: james-tigase-rest-client-xml
+              mountPath: /root/conf/tigaserestclient.xml
+              subPath: tigaserestclient.xml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         - name: james-config-props
           configMap:
             name: {{ include "james.fullname" . }}-config-props
+        - name: james-tigase-rest-client-xml
+          configMap:
+            name: {{ include "james.fullname" . }}-tigase-rest-client-xml
         - name: james-config-data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:

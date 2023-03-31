@@ -76,3 +76,20 @@ Create the name of the service account to use
 {{- define "james.databasePassword" -}}
   {{- printf "%s" .Values.database.password -}}
 {{- end -}}
+
+{{- define "james.tigaseHost" -}}
+  {{- printf "%s" .Values.tigase.host -}}
+{{- end -}}
+
+{{- define "james.tigasePort" -}}
+  {{- printf "%s" .Values.tigase.port -}}
+{{- end -}}
+
+{{- define "james.tigaseAdminUsername" -}}
+  {{- printf "%s" .Values.tigase.admin.username -}}
+{{- end -}}
+
+{{- define "james.tigaseAdminPassword" -}}
+  {{- printf "%s" .Values.tigase.admin.password -}}
+{{- end -}}
+

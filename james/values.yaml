@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: 'apache/james'
+  repository: 'tygrysinc/james-tigase-integration'
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
@@ -32,6 +32,13 @@ database:
   name: "james"
   username: "james"
   password: ""
+
+tigase:
+  host: "tigase"
+  port: "8080"
+  admin:
+    username: "james@hostname"
+    password: ""
 
 service:
   type: ClusterIP

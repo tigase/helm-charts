@@ -10,3 +10,22 @@ data:
     database.password={{ include "james.databasePassword" . }}
 
     openjpa.streaming=false
+
+---
+
+kind: ConfigMap
+metadata:
+  name: {{ include "james.fullname" . }}-tigase-rest-client-xml
+apiVersion: v1
+data:
+  tigaserestclient.xml: |-
+    <?xml version="1.0"?>
+    <tigaserestclient>
+        <tigaseHttpApiUrl>http://{{ include "james.tigaseHost" . }}:{{ include "james.tigasePort" . }}</tigaseHttpApiUrl>
+        <tigaseAdminUsername>{{ include "james.tigaseAdminUsername" . }}</tigaseAdminUsername>
+        <tigaseAdminPassword>{{ include "james.tigaseAdminPassword" . }}</tigaseAdminPassword>
+        <tigaseUseCache>true</tigaseUseCache>
+        <tigaseExpirationTimeInMinutes>1</tigaseExpirationTimeInMinutes>
+    </tigaserestclient>
+
+
