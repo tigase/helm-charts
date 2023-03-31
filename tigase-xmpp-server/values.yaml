@@ -108,6 +108,8 @@ fileUpload:
     bucket: ''
     region: ''
     # (optional)
+    pathPrefix: ''
+    # (optional)
     endpointUrl: ''
     accessKeyId: ''
     # name of the secret containing password (accessKeyId is used as a secret key to retrieve actual value)

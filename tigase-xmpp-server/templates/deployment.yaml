@@ -105,6 +105,8 @@ spec:
               value: {{ .Values.fileUpload.s3storage.bucket | quote }}
             - name: UPLOAD_S3_REGION
               value: {{ .Values.fileUpload.s3storage.region | quote }}
+            - name: UPLOAD_S3_PREFIX
+              value: {{ .Values.fileUpload.s3storage.pathPrefix | default (include "tigase.vhost" .) | quote }}
             - name: UPLOAD_S3_ACCESS_KEY_ID
               value: {{ .Values.fileUpload.s3storage.accessKeyId | quote }}
             - name: UPLOAD_S3_SECRET_KEY

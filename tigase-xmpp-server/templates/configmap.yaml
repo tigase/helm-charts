@@ -115,7 +115,7 @@ upload () {
     store (class: tigase.extras.http.upload.S3Store, active: true, exportable: true) {
     	autocreateBucket = true
         bucket = env('UPLOAD_S3_BUCKET')
-        bucketKeyPrefix = env('VHOST')
+        bucketKeyPrefix = env('UPLOAD_S3_PREFIX')
 {{- if .Values.fileUpload.s3storage.region }}
         region = env('UPLOAD_S3_REGION')
 {{- end }}
