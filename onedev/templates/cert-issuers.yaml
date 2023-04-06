@@ -36,7 +36,6 @@ spec:
         ingress:
           class: nginx
 {{- end }}
-{{- end }}
 ---
 {{- if .Values.ingress.tls }}
 apiVersion: cert-manager.io/v1
@@ -54,5 +53,6 @@ spec:
     {{- range .Values.ingress.tls.hosts }}
     - {{ . | quote }}
     {{- end }}
+{{- end }}
 {{- end }}
 {{- end }}
