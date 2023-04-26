@@ -12,6 +12,11 @@ killbill:
     tag: ""
 
   enableAdminUser: false
+
+  plugins:
+    persistentVolume:
+      enabled: false
+      storage: 1Gi
     
   resources: {}
   affinity: {}

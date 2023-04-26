@@ -78,6 +78,12 @@ spec:
             items:
               - key: shiro.ini
                 path: shiro.ini
+        {{- if .Values.killbill.plugins.persistentVolume.enabled }}
+        - name: plugins
+          persistentVolumeClaim:
+            claimName: {{ include "killbill.fullname" . }}-plugins
+        {{- end }}
+          
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -101,6 +107,10 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/killbill/config
               name: config
+            {{- if .Values.killbill.plugins.persistentVolume.enabled }}
+            - mountPath: /var/lib/killbill/bundles/plugins
+              name: plugins
+            {{- end }}
           resources:
           {{- toYaml .Values.killbill.resources | nindent 12 }}
       restartPolicy: Always

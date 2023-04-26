@@ -1,0 +1,14 @@
+{{- if .Values.killbill.plugins.persistentVolume.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "killbill.fullname" . }}-plugins
+  labels:
+    {{- include "killbill.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.killbill.plugins.persistentVolume.storage | default "1Gi" }}
+{{- end }}
