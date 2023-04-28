@@ -93,3 +93,19 @@ Create the name of the service account to use
   {{- printf "%s" .Values.tigase.admin.password -}}
 {{- end -}}
 
+{{- define "james.RemoteDelivery.gateway" -}}
+  {{- printf "%s" .Values.mailet.remoteDelivery.gateway -}}
+{{- end -}}
+
+{{- define "james.RemoteDelivery.gatewayPort" -}}
+  {{- printf "%s" .Values.mailet.remoteDelivery.gatewayPort -}}
+{{- end -}}
+
+{{- define "james.RemoteDelivery.gatewayUsername" -}}
+  {{- printf "%s" .Values.mailet.remoteDelivery.gatewayUsername -}}
+{{- end -}}
+
+{{- define "james.RemoteDelivery.gatewayPassword" -}}
+  {{- printf "%s" .Values.mailet.remoteDelivery.gatewayPassword -}}
+{{- end -}}
+

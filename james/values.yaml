@@ -40,6 +40,13 @@ tigase:
     username: "james@hostname"
     password: ""
 
+mailet:
+  remoteDelivery:
+    gateway: ""
+    gatewayPort: ""
+    gatewayUsername: ""
+    gatewayPassword: ""
+
 service:
   type: ClusterIP
   ports:

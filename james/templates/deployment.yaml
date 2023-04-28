@@ -82,6 +82,9 @@ spec:
             - name: james-tigase-rest-client-xml
               mountPath: /root/conf/tigaserestclient.xml
               subPath: tigaserestclient.xml
+            - name: james-james-mailetcontainer-xml
+              mountPath: /root/conf/mailetcontainer.xml
+              subPath: mailetcontainer.xml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
@@ -91,6 +94,9 @@ spec:
         - name: james-tigase-rest-client-xml
           configMap:
             name: {{ include "james.fullname" . }}-tigase-rest-client-xml
+        - name: james-james-mailetcontainer-xml
+          configMap:
+            name: {{ include "james.fullname" . }}-james-mailetcontainer-xml
         - name: james-config-data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
