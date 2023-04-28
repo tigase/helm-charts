@@ -99,14 +99,6 @@ spec:
           emptyDir:
             {}
           {{- end }}
-        - name: james-jdbc-driver
-          {{- if .Values.persistence.enabled }}
-          persistentVolumeClaim:
-            claimName: {{ include "james.fullname" . }}-jdbc-driver
-          {{- else }}
-          emptyDir:
-            {}
-          {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
