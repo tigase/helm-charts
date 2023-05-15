@@ -8,7 +8,7 @@ data:
   shiro.ini: |
     [users]
     {{- if .Values.killbill.enableAdminUser }}
-    admin = password, root
+    admin = {{ .Values.killbill.admin.password | default "password" }}, root
     {{- end }}
     [roles]
     root = *:*

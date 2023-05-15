@@ -12,6 +12,8 @@ killbill:
     tag: ""
 
   enableAdminUser: false
+  admin:
+    password: ""
 
   plugins:
     persistentVolume:
