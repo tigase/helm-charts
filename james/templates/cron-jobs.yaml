@@ -1,0 +1,27 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ printf "%s-update-certs" (include "james.fullname" .) | trunc 63 | trimSuffix "-"  }}
+spec:
+  schedule: {{ .Values.certificate.refresh.schedule | quote }}
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cert-reload
+              image: curlimages/curl:7.87.0
+              imagePullPolicy: IfNotPresent
+              env:
+                - name: JAMES_SERVICE
+                  value: {{ include "james.fullname" . }}-http
+                - name: JAMES_SERVICE_PORT
+                  value: "8080"
+              command:
+                - /bin/sh
+                - "-c"
+                - |
+                  curl -s -X POST http://${JAMES_SERVICE}:${JAMES_SERVICE_PORT}/server/_all?reload-certificate
+          restartPolicy: Never
+

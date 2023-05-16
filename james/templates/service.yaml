@@ -94,6 +94,7 @@ spec:
       targetPort: http-admin
       name: http-admin
       protocol: TCP
+  internalTrafficPolicy: Local # James http-api doesn't offer any authentication thus limiting access
   selector:
     {{- include "james.selectorLabels" . | nindent 4 }}
 
