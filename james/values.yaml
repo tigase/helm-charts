@@ -74,7 +74,6 @@ ingress:
   sslProvider: "self-signed"
   certificateIssuer: ""
   tls:
-    secretName: "" ## set to name to enable
     hosts:
       - james
 

@@ -68,10 +68,8 @@ spec:
             - name: james-james-mailetcontainer-xml
               mountPath: /root/conf/mailetcontainer.xml
               subPath: mailetcontainer.xml
-            {{- if .Values.ingress.tls.secretName }}
             - name: james-secrets
               mountPath: /root/secrets
-            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
