@@ -68,6 +68,9 @@ ingress:
   # kubernetes.io/tls-acme: "true"
   hosts:
     - host: james
+      paths:
+        - path: /
+          pathType: Prefix
   ## Name of the SSL certificate provider to use from:
   ## - self-signed
   ## - letsencrypt
