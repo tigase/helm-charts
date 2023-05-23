@@ -25,6 +25,9 @@ spec:
     # Let's Encrypt will use this to contact you about expiring
     # certificates, and issues related to your account.
     email: {{ .Values.ingress.acme.email }}
+    {{- if .Values.ingress.acme.preferredChain }}
+    preferredChain: {{ .Values.ingress.acme.preferredChain | quote }}
+    {{- end }}
     server: {{ default "https://acme-staging-v02.api.letsencrypt.org/directory" .Values.ingress.acme.server }}
     privateKeySecretRef:
       # Secret resource that will be used to store the account's private key.
