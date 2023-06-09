@@ -81,6 +81,7 @@ ingress:
       - james
 
 certificate:
+  annotations: { }
   refresh:
     schedule: "0 0 * * *" ## daily
 #    schedule: "* * * * *" ## every minute
