@@ -7,6 +7,8 @@ metadata:
     k8s-app: {{ include "unbound.fullname" . }}
     {{- include "unbound.labels" . | nindent 4 }}
 spec:
+  selector:
+    k8s-app: {{ include "unbound.fullname" . }}
   type: {{ .Values.service.type }}
   ports:
     - name: udp-53
