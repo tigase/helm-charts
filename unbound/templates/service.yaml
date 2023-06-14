@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "unbound.fullname" . }}
+  labels:
+    kubernetes.io/cluster-service: "true"
+    k8s-app: {{ include "unbound.fullname" . }}
+    {{- include "unbound.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: udp-53
+      port: 53
+      targetPort: udp-53
+      protocol: UDP
+    - name: tcp-53
+      port: 53
+      targetPort: tcp-53
+      protocol: TCP
