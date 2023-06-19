@@ -18,10 +18,10 @@ data:
 
 
       ## Decreasing timeout to improve resolution when issuing certificates #TB-71
-      cache-max-ttl: 60
-      cache-min-ttl: 60
+      cache-max-ttl: 15
+      cache-min-ttl: 15
 
-      infra-host-ttl: 60
+      infra-host-ttl: 15
       infra-keep-probing: yes
 
       # Time to live minimum for RRsets and messages in the cache. If the minimum
