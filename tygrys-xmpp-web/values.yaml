@@ -50,7 +50,7 @@ ingress:
     # preferredChain: "ISRG Root X1"
   ## Name of the certificate issuer to use instead of sslProvider
   sslCertificateIssuer: ""
-  tls: 
+  tls: {}
   #   hosts:
   #     - chart-example.local
 
