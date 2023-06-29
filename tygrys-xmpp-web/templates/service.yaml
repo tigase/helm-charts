@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tygrys-xmpp-web.fullname" . }}
+  labels:
+    {{- include "tygrys-xmpp-web.labels" . | nindent 4 }}
+    tier: server
+  annotations:
+  {{- with .Values.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "tygrys-xmpp-web.selectorLabels" . | nindent 4 }}
+    tier: server
