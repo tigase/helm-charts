@@ -74,15 +74,6 @@ spec:
       nodePort: 993
       {{- end }}
     {{- end }}
-    {{- if .Values.service.ports.sieve }}
-    - port: 993
-      targetPort: sieve
-      protocol: TCP
-      name: sieve
-      {{- if eq .Values.service.type "NodePort" }}
-      nodePort: 4190
-      {{- end }}
-    {{- end }}
   selector:
     {{- include "james.selectorLabels" . | nindent 4 }}
 ---
