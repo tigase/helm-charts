@@ -56,6 +56,7 @@ service:
     pop3s: true
     imap: true
     imaps: true
+    sieve: true
 
 persistence:
   enabled: false
