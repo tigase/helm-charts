@@ -49,12 +49,15 @@ mailet:
 
 service:
   type: ClusterIP
+  unencryptedType: ClusterIP
   ports:
     smtp: true
+    smtpunencrypted: true
     smtps: true
     pop3: true
     pop3s: true
     imap: true
+    imapunencrypted: true
     imaps: true
 
 persistence:

@@ -59,6 +59,9 @@ spec:
             - name: imaps
               containerPort: 993
               protocol: TCP
+            - name: imapunencrypted
+              containerPort: 1143
+              protocol: TCP
             - name: http-admin
               containerPort: 8000
               protocol: TCP

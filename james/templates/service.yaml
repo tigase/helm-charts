@@ -11,12 +11,12 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    {{- if .Values.service.ports.smtp }}
+    {{- if .Values.service.ports.smtpunencrypted }}
     - port: 25
       targetPort: smtp
       protocol: TCP
       name: smtp
-      {{- if eq .Values.service.type "NodePort" }}
+      {{- if eq .Values.service.unencryptedType "NodePort" }}
       nodePort: 25
       {{- end }}
     {{- end }}
@@ -29,7 +29,7 @@ spec:
       nodePort: 465
       {{- end }}
     {{- end }}
-    {{- if .Values.service.ports.smtps }}
+    {{- if .Values.service.ports.smtp }}
     - port: 587
       targetPort: smtp-starttls
       protocol: TCP
@@ -72,6 +72,15 @@ spec:
       name: imaps
       {{- if eq .Values.service.type "NodePort" }}
       nodePort: 993
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.imapunencrypted }}
+    - port: 1143
+      targetPort: imapunencrypted
+      protocol: TCP
+      name: imapunencrypted
+      {{- if eq .Values.service.unencryptedType "NodePort" }}
+      nodePort: 1143
       {{- end }}
     {{- end }}
   selector:
