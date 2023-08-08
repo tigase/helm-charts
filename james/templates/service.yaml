@@ -11,13 +11,22 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
-    {{- if .Values.service.ports.smtpunencrypted }}
+    {{- if .Values.service.ports.smtp }}
     - port: 25
       targetPort: smtp
       protocol: TCP
       name: smtp
-      {{- if eq .Values.service.unencryptedType "NodePort" }}
+      {{- if eq .Values.service.type "NodePort" }}
       nodePort: 25
+      {{- end }}
+    {{- end }}
+    {{- if .Values.service.ports.smtpunencrypted }}
+    - port: 1125
+      targetPort: smtpunencrypted
+      protocol: TCP
+      name: smtpunencrypted
+      {{- if eq .Values.service.unencryptedType "NodePort" }}
+      nodePort: 1125
       {{- end }}
     {{- end }}
     {{- if .Values.service.ports.smtps }}
@@ -29,7 +38,7 @@ spec:
       nodePort: 465
       {{- end }}
     {{- end }}
-    {{- if .Values.service.ports.smtp }}
+    {{- if .Values.service.ports.smtps }}
     - port: 587
       targetPort: smtp-starttls
       protocol: TCP
