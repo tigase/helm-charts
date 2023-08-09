@@ -59,6 +59,7 @@ service:
     imap: true
     imapunencrypted: true
     imaps: true
+    sieve: true
 
 persistence:
   enabled: false

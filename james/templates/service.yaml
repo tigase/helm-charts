@@ -92,6 +92,15 @@ spec:
       nodePort: 1143
       {{- end }}
     {{- end }}
+    {{- if .Values.service.ports.sieve }}
+    - port: 4190
+      targetPort: sieve
+      protocol: TCP
+      name: sieve
+      {{- if eq .Values.service.unencryptedType "NodePort" }}
+      nodePort: 4190
+      {{- end }}
+    {{- end }}
   selector:
     {{- include "james.selectorLabels" . | nindent 4 }}
 ---

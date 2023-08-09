@@ -65,6 +65,9 @@ spec:
             - name: imapunencrypted
               containerPort: 1143
               protocol: TCP
+            - name: sieve
+              containerPort: 4190
+              protocol: TCP
             - name: http-admin
               containerPort: 8000
               protocol: TCP
