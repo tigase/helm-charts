@@ -4,7 +4,7 @@ nameOverride: ""
 fullnameOverride: ""
 
 killbill:
-  version: "0.22"
+  version: "0.24"
   image:
     repository: killbill/killbill
     pullPolicy: IfNotPresent
