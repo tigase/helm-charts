@@ -94,6 +94,11 @@ service:
     ws2s: 5290
     wss2s: 5291
     http: 8080
+  # IP families allowed to use (if unset uses default)
+  ipFamilies: []
+  # Used IP family policy (if unset uses default)
+  # if set to PreferDualStack or RequiredDualStack may enable IPv6 connectivity for service (cluster nodes and pods should also have IPv6 available)
+  ipFamilyPolicy: ''
     
 # HTTP File Upload
 fileUpload:
