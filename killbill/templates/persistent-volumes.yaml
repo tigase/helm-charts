@@ -1,4 +1,4 @@
-{{- if .Values.killbill.plugins.persistentVolume.enabled }}
+{{- if and .Values.killbill.plugins.persistentVolume.enabled (not .Values.killbill.plugins.persistentVolume.existingClaim) }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:

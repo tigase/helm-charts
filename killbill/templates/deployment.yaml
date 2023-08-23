@@ -83,7 +83,12 @@ spec:
         {{- if .Values.killbill.plugins.persistentVolume.enabled }}
         - name: plugins
           persistentVolumeClaim:
+          {{- if .Values.killbill.plugins.persistentVolume.existingClaim }}
+            claimName: {{ .Values.killbill.plugins.persistentVolume.existingClaim }}
+          {{- end }}
+          {{- if not .Values.killbill.plugins.persistentVolume.existingClaim }}
             claimName: {{ include "killbill.fullname" . }}-plugins
+          {{- end }}
         {{- end }}
           
       containers:
