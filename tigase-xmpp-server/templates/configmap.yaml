@@ -140,6 +140,17 @@ upload (active: false) {}
 }
 ws2s {
     seeOtherHost (active: false) {}
+    connections {
+    ports = [ 5290, 5291 ]
+    5290 {
+      socket = 'plain'
+      type = 'accept'
+    }
+    5291 {
+      socket = 'ssl'
+      type = 'accept'
+    }
+  }
 }
 {{- if .Values.additionalConfiguration }}
 {{ print .Values.additionalConfiguration }}
