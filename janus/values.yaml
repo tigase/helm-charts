@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: '441807014745.dkr.ecr.us-west-2.amazonaws.com/kangaroo.net/tigase-meet-janus'
+  repository: 'tygrysinc/tigase-meet-janus'
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "nightly-2021-08-20-1"
 
 imagePullSecrets: []
 nameOverride: ""
