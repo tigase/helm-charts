@@ -4,7 +4,7 @@
 
 onedev:
   image:
-    repository: 1dev/server
+    repository: tygrysinc/1dev-server
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
