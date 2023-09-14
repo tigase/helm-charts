@@ -6,10 +6,10 @@
 replicaCount: 1
 
 image:
-  repository: tigase/tigase-xmpp-server
+  repository: tygrysinc/tigase-xmpp-server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "nightly-2023-09-02"
 
 disableEnterpriseCheck: false
 
