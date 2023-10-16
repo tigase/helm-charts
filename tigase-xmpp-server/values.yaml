@@ -158,11 +158,11 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
+  hosts: {}
+#    - host: chart-example.local
+#      paths:
+#        - path: /
+#          pathType: ImplementationSpecific
   ## Name of the SSL certificate provider to use from:
   ## - self-signed
   ## - letsencrypt          
@@ -171,7 +171,7 @@ ingress:
     # preferredChain: "ISRG Root X1"
   ## Name of the certificate issuer to use instead of sslProvider
   sslCertificateIssuer: ""
-  tls: 
+  tls: {}
   #   hosts:
   #     - chart-example.local
 

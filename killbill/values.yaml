@@ -73,7 +73,7 @@ ingress:
   ## - letsencrypt
   sslProvider: "self-signed"
   certificateIssuer: ""
-  tls:
+  tls: {}
   #  - secretName: chart-example-tls
   #    hosts:
   #      - chart-example.local
