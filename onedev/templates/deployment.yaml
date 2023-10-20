@@ -63,6 +63,8 @@ spec:
               key: mysql-root-password
         - name: hibernate_hikari_maximumPoolSize
           value: "25"
+        - name: max_memory_percent
+          value: "{{ (((.Values).onedev).jvm).maxMemoryPercent | default 50 }}"
         {{- with .Values.onedev.init }}
         - name: "initial_user"
           value: {{ .user.username | quote }}
