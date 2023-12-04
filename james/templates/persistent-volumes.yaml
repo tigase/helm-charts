@@ -11,4 +11,17 @@ spec:
   resources:
     requests:
       storage: 100Mi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "james.fullname" . }}-store
+  labels:
+    {{- include "james.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.persistence.store.size | default "1Gi" }}
 {{- end }}
