@@ -63,6 +63,8 @@ service:
 
 persistence:
   enabled: false
+  store:
+    size: 1Gi
 
 ingress:
   enabled: true

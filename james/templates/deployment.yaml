@@ -78,6 +78,8 @@ spec:
             - name: james-config-data
               mountPath: /root/secrets/keystore
               subPath: keystore
+            - name: james-store
+              mountPath: /root/var/store
             - name: james-tigase-rest-client-xml
               mountPath: /root/conf/tigaserestclient.xml
               subPath: tigaserestclient.xml
@@ -102,6 +104,14 @@ spec:
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ include "james.fullname" . }}-config-data
+          {{- else }}
+          emptyDir:
+            {}
+          {{- end }}
+        - name: james-store
+          {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ include "james.fullname" . }}-store
           {{- else }}
           emptyDir:
             {}
