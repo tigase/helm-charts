@@ -21,7 +21,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: {{ .Values.ingress.sslCertificateIssuer | default (printf "%s-cluster-issuer" (include "tigase-xmpp-server.fullname" .)) | trunc 63 | trimSuffix "-" }}
     {{- if and .Values.fileUpload.enabled .Values.fileUpload.maxFileSize }}
-    nginx.ingress.kubernetes.io/proxy-body-size: {{ div .Values.fileUpload.maxFileSize 1048576 }}m
+    nginx.ingress.kubernetes.io/proxy-body-size: {{ div (int64 .Values.fileUpload.maxFileSize) 1048576 }}m
     {{- end }}
     {{- with .Values.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
