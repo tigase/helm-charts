@@ -60,6 +60,79 @@ meet () {
     uri = env('JANUS_URI')
 }
 {{- end }}
+{{- if .Values.mailer.enabled }}
+    mailer (class: tigase.extras.mailer.Mailer) {
+        'mailer-from-address' = {{ .Values.mailer.from | quote }}
+        'mailer-smtp-host' = {{ .Values.mailer.host | quote }}
+        'mailer-smtp-port' = {{ .Values.mailer.port | quote }}
+        'mailer-smtp-password' = {{ .Values.mailer.password | quote }}
+        'mailer-smtp-username' = {{ .Values.mailer.username | quote }}
+    }
+{{- end }}
+{{- if .Values.monitor }}
+monitor (active: {{ .Values.monitor.enabled }}) {
+    {{- with .Values.monitor }}
+    commands {
+        'x-add-task' = 'ADMIN'
+        'x-add-timer-task' = 'ADMIN'
+        'x-delete-task' = 'ADMIN'
+    }
+    {{- with .connections }}
+    'connections-task' {
+        enabled = {{ .enabled }}
+        {{- with .period }}
+        period = {{ . }}
+        {{- end }}
+    }
+    {{- end }}
+    {{- with .disk }}
+    'disk-task' {
+        enabled = {{ .enabled }}
+        {{- with .period }}
+        period = {{ . }}
+        {{- end }}
+    }
+    {{- end }}
+    {{- with .loadChecked }}
+    'load-checker-task' {
+        {{- with .averageLoadThreshold }}
+        averageLoadThreshold = {{ . }}
+        {{- end }}
+        enabled = {{ .enabled }}
+        {{- with .period }}
+        period = {{ . }}
+        {{- end }}
+    }
+    {{- end }}
+    {{- with .logger }}
+    'logger-task' {
+        enabled = {{ .enabled }}
+        levelThreshold = {{ .levelThreshold | quote }}
+    }
+    {{- end }}
+    {{- with .memoryChecker}}
+    'memory-checker-task' {
+        enabled = {{ .enabled }}
+        {{- with .maxHeapMemUsagePercentThreshold }}
+        maxHeapMemUsagePercentThreshold = {{ . }}
+        {{- end }}
+        {{- with .maxNonHeapMemUsagePercentThreshold }}
+        maxNonHeapMemUsagePercentThreshold = {{ . }}
+        {{- end }}
+        {{- with .period }}
+        period = {{ . }}
+        {{- end }}
+    }
+    {{- end }}
+    {{- end }}
+    {{- if and (and .Values.mailer.from .Values.monitor.mailer.to) .Values.monitor.mailer.enabled }}
+    'monitor-mailer' (class: tigase.server.ext.monitor.MonitorMailer) {
+        'from-address' = {{ .Values.monitor.mailer.from | default .Values.mailer.from | quote }}
+        'to-addresses' = {{ .Values.monitor.mailer.to | quote }}
+    }
+    {{- end }}
+}
+{{- end }}
 muc () {
     'message-filter-enabled' = false
     'ping-every-minute' = true
@@ -102,6 +175,7 @@ pubsub () {
     'urn:xmpp:push:0' () {
         away () {}
     }
+    'spam-filter' (active: {{ .Values.spamFiltering.enabled }}) {}
 }
 {{- if .Values.fileUpload.enabled }}
 upload () {
