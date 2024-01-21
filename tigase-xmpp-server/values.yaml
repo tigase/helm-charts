@@ -132,6 +132,39 @@ meet:
   # uri to access Janus from inside k8s cluster
   janusURI: "ws://janus:8188/"          
 
+mailer:
+  from: ''
+  enabled: false
+  port: 587
+  host: ''
+  username: ''
+  password: ''
+
+monitor:
+  enabled: false
+  connections:
+    enabled: false
+    # period: 15000
+  disk:
+    enabled: false
+    # period: 15000
+  loadChecked:
+    enabled: false
+    # averageLoadThreshold: 30
+    # period: 0
+  logger:
+    enabled: false
+    # levelThreshold: WARNING
+  memoryChecker:
+    enabled: false
+    # maxHeapMemUsagePercentThreshold: 95
+    # maxNonHeapMemUsagePercentThreshold: 95
+    # period: 15000
+  mailer:
+    enabled: false
+    from: ''
+    to: ''
+
 rest:
   openAccess: false
 
@@ -144,6 +177,9 @@ users:
 sessMan:
   amp:
     threadsNo: ''
+
+spamFiltering:
+  enabled: true
     
 additionalConfiguration: ''
 
