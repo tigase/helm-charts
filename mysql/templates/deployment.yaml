@@ -59,6 +59,10 @@ spec:
           volumeMounts:
             - name: mysql
               mountPath: /var/lib/mysql
+            {{- if .Values.configuration }}
+            - name: config
+              mountPath: /etc/mysql/conf.d
+            {{- end }}
 #          readinessProbe:
 #            exec:
 #              command:
@@ -198,6 +202,14 @@ spec:
           {{- else }}
             {}
           {{- end }}
+        {{- end }}
+        {{- if .Values.configuration }}
+        - name: config
+          configMap:
+            name: {{ include "mysql.fullname" . }}
+            items:
+              - key: 'my.cnf'
+                path: 'my.cnf'
         {{- end }}
         {{- if .Values.backup.persistentVolume.enabled }}
         - name: mysql-backup
