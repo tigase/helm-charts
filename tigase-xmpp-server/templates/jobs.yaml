@@ -71,8 +71,8 @@ spec:
               </fields>
               </command>"
               RESPONSE=`curl -s -L -H "Content-Type: text/xml" -X POST ${AUTH} http://${TIGASE_SERVICE}:8080/rest/adhoc/vhost-man@${domain}${API_KEY} -d "${REQUEST}"`
-              if [[ ! ${RESPONSE} = *"loaded successfully"* ]]; then
-                echo -e "Server returned error while updating ${domain} certificate: \n ${RESPONSE}"
+              if [[ ! "${RESPONSE}" = *"loaded successfully"* ]]; then
+                echo "Server returned error while updating ${domain} certificate: \n ${RESPONSE}"
               else
                 echo "Correctly updated certificate for ${domain}"
               fi
