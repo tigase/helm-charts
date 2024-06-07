@@ -11,6 +11,11 @@ data:
 
     openjpa.streaming=false
 
+    datasource.maxTotal=40
+    datasource.initialSize=1
+    datasource.MinIdle=1
+    
+    openjpa.Multithreaded=true
 ---
 
 kind: ConfigMap
@@ -46,7 +51,7 @@ data:
         </context>
 
         <spooler>
-            <threads>20</threads>
+            <threads>10</threads>
             <errorRepository>file://var/mail/error/</errorRepository>
         </spooler>
 
