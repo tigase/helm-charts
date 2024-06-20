@@ -89,7 +89,11 @@ spec:
           {{- toYaml .Values.onedev.resources | nindent 10 }}
         volumeMounts:
         - mountPath: "/opt/onedev"
-          name: onedev              
+          name: onedev
+        {{- range .Values.onedev.remoteClusterConfigs }}
+        - mountPath: "/opt/onedev/remote-cluster-configs/{{ . }}"
+          name: {{ . }}
+        {{- end }}
       initContainers:
         - name: init
           image: busybox:1.28
@@ -109,6 +113,12 @@ spec:
         {{- else }}
           {}
         {{- end }}
+      {{- end }}
+      {{- range .Values.onedev.remoteClusterConfigs }}
+      - name: {{ . }}
+        secret:
+          secretName: {{ . }}
+          optional: true
       {{- end }}
       {{- with .Values.onedev.affinity }}
       affinity:
