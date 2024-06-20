@@ -36,6 +36,10 @@ onedev:
   maintenance: false
   restartPolicy: ""
 
+  remoteClusterConfigs: []
+    # List of secrets holding kubectl files
+    # - aws-kubectl
+
   service:
     annotations: {}
     type: LoadBalancer
