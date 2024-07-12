@@ -21,9 +21,15 @@ version: 0.9.9
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-#
-# Check if the tag exists on dockerhub: https://hub.docker.com/r/1dev/server/tags !!!
-#
+
+
+
+
+
+
+# Check if the tag exists on dockerhub: https://hub.docker.com/r/tygrysinc/1dev-server/tags !!!
+#     If not it has to be build in project `onedev-tigase-extensions`!
+
 appVersion: "10.9.4"
 
 dependencies:
