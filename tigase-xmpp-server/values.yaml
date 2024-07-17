@@ -36,6 +36,19 @@ podSecurityContext: {}
   # fsGroup: 2000
 
 securityContext: {}
+  # Recommended sysctl settings for Tigase XMPP Server
+  # -------------------------------
+  # sysctl:
+  #   - name: net.ipv4.ip_local_port_range
+  #     value: "32768    61000"
+  #   # supported since Kubernetes 1.29
+  #   - name: net.ipv4.tcp_keepalive_time
+  #     value: "60"
+  #   - name: net.ipv4.tcp_keepalive_probes
+  #     value: "3"
+  #   - name: net.ipv4.tcp_keepalive_intvl
+  #     value: "90"
+  # -------------------------------
   # capabilities:
   #   drop:
   #   - ALL
