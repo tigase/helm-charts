@@ -175,6 +175,8 @@ pubsub () {
     'urn:xmpp:push:0' () {
         away () {}
     }
+    'urn:xmpp:sasl:2' () {}
+    'urn:xmpp:bind:0' () {}
     'spam-filter' (active: {{ .Values.spamFiltering.enabled }}) {}
 }
 {{- if .Values.fileUpload.enabled }}
