@@ -118,4 +118,6 @@ spec:
       protocol: TCP
       name: ldaps
     {{- end }}
+  selector:
+    {{- include "tigase-xmpp-server.selectorLabels" . | nindent 4 }}
 {{- end }}
