@@ -69,5 +69,55 @@ spec:
       {{- if eq .Values.service.type "NodePort" }}
       nodePort: {{ .Values.service.ports.s2s }}
       {{- end }}
+    {{- if .Values.ldap.enabled }}
+    {{- if and .Values.ldap.plain.enabled  .Values.service.ports.ldap }}
+    - port: 10389
+      targetPort: ldap
+      protocol: TCP
+      name: ldap
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.ldap }}
+      {{- end }}
+    {{- end }}
+    {{- if and .Values.ldap.ssl.enabled  .Values.service.ports.ldaps }}
+    - port: 10636
+      targetPort: ldaps
+      protocol: TCP
+      name: ldaps
+      {{- if eq .Values.service.type "NodePort" }}
+      nodePort: {{ .Values.service.ports.ldaps }}
+      {{- end }}
+    {{- end }}
+    {{- end }}
   selector:
     {{- include "tigase-xmpp-server.selectorLabels" . | nindent 4 }}
+---
+{{- if and .Values.ldap.enabled (or .Values.ldap.plain.enabled .Values.ldap.ssl.enabled) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "tigase-xmpp-server.ldap.fullname" . }}
+  labels:
+    {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
+  annotations:
+  {{- with .Values.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    {{- if .Values.ldap.plain.enabled }}
+    - port: 10389
+      targetPort: ldap
+      protocol: TCP
+      name: ldap
+    {{- end }}
+    {{- if .Values.ldap.ssl.enabled }}
+    - port: 10636
+      targetPort: ldaps
+      protocol: TCP
+      name: ldaps
+    {{- end }}
+  selector:
+    {{- include "tigase-xmpp-server.selectorLabels" . | nindent 4 }}
+{{- end }}

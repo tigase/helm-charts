@@ -165,3 +165,31 @@ data:
         </processors>
     </mailetcontainer>
 
+{{- if .Values.ldap.enabled }}
+---
+
+kind: ConfigMap
+metadata:
+  name: {{ include "james.fullname" . }}-james-usersrepository-xml
+apiVersion: v1
+data:
+  usersrepository.xml: |-
+    <usersrepository name="LocalUsers" class="org.apache.james.user.ldap.ReadOnlyUsersLDAPRepository" ldapHost="{{ .Values.ldap.uri }}"
+            principal="{{ .Values.ldap.managerDN }}" credentials="{{ .Values.ldap.managerPassword }}" userBase="{{ .Values.ldap.baseDN }}" userIdAttribute="{{ .Values.ldap.uidAttribute }}"
+            trustAllCerts="true" userObjectClass="posixAccount">
+        <enableVirtualHosting>true</enableVirtualHosting>
+        <domains>
+            {{- range .Values.ldap.additionalBaseDN }}
+            {{ $baseDN := .baseDN }}
+            {{- $parts := splitList "." .domain }}
+            {{- range $parts }}
+            {{- printf "<%s>" . }}
+            {{- end }}
+            {{- $baseDN }}
+            {{- range (reverse $parts) }}
+            {{- printf "</%s>" . }}
+            {{- end }}
+            {{- end }}
+        </domains>
+    </usersrepository>
+{{- end }}
