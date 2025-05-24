@@ -13,10 +13,11 @@ spec:
       {{- include "james.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/james-config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- end }}
       labels:
         {{- include "james.selectorLabels" . | nindent 8 }}
     spec:
@@ -88,6 +89,11 @@ spec:
             - name: james-james-mailetcontainer-xml
               mountPath: /root/conf/mailetcontainer.xml
               subPath: mailetcontainer.xml
+            {{- if .Values.ldap.enabled }}
+            - name: james-james-usersrepository-xml
+              mountPath: /root/conf/usersrepository.xml
+              subPath: usersrepository.xml
+            {{- end }}
             - name: james-secrets
               mountPath: /root/secrets
           resources:
@@ -102,6 +108,11 @@ spec:
         - name: james-james-mailetcontainer-xml
           configMap:
             name: {{ include "james.fullname" . }}-james-mailetcontainer-xml
+        {{- if .Values.ldap.enabled }}
+        - name: james-james-usersrepository-xml
+          configMap:
+            name: {{ include "james.fullname" . }}-james-usersrepository-xml
+        {{- end }}
         - name: james-config-data
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
