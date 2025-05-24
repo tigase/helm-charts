@@ -55,6 +55,16 @@ httpServer (class: tigase.http.jetty.JettyStandaloneHttpServer) {
 'message-router' () {
     'detailed-memory-statistics' = true
 }
+{{- if .Values.ldap.enabled }}
+ldap () {
+    {{- if eq .Values.ldap.access "Anonymous" }}
+    'anonymousAccess' = true
+    {{- end }}
+    {{- if eq .Values.ldap.access "User" }}
+    'anyoneCanQuery' = true
+    {{- end }}
+}
+{{- end }}
 {{- if .Values.meet.enabled }}
 meet () {
     uri = env('JANUS_URI')

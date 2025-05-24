@@ -94,6 +94,8 @@ service:
     ws2s: 5290
     wss2s: 5291
     http: 8080
+    # ldap: 10389
+    # ldaps: 10636
   # IP families allowed to use (if unset uses default)
   ipFamilies: []
   # Used IP family policy (if unset uses default)
@@ -125,6 +127,15 @@ fileUpload:
   pvStorage:
     existingClaim: ''
     storage: 5Gi
+
+ldap:
+  enabled: false
+  # access can be set to Anonymous, User (any user can access any other user data), or Admin
+  access: 'Admin'
+  plain:
+    enabled: false
+  ssl:
+    enabled: false
 
 # Configuration for Tigase Meet        
 meet:

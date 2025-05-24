@@ -40,6 +40,16 @@ tigase:
     username: "james@hostname"
     password: ""
 
+ldap:
+  enabled: false
+  uri: ""
+  uidAttribute: "mail"
+  managerDN: ""
+  managerPassword: ""
+  baseDN: ""
+  additionalBaseDN: []
+#    - domain: "example.com"
+#      baseDN: "ou=Users,dc=example,dc=com"
 mailet:
   remoteDelivery:
     gateway: ""

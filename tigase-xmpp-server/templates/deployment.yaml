@@ -59,6 +59,18 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            {{- if .Values.ldap.enabled }}
+            {{- if .Values.ldap.plain.enabled }}
+            - name: ldap
+              containerPort: 10389
+              protocol: TCP
+            {{- end }}
+            {{- if .Values.ldap.ssl.enabled }}
+            - name: ldaps
+              containerPort: 10636
+              protocol: TCP
+            {{- end }}
+            {{- end }}
           env:
             {{- if .Values.users.create }}
             - name: ADMIN_JID
