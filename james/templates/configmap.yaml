@@ -176,7 +176,7 @@ data:
   usersrepository.xml: |-
     <usersrepository name="LocalUsers" class="org.apache.james.user.ldap.ReadOnlyUsersLDAPRepository" ldapHost="{{ .Values.ldap.uri }}"
             principal="{{ .Values.ldap.managerDN }}" credentials="{{ .Values.ldap.managerPassword }}" userBase="{{ .Values.ldap.baseDN }}" userIdAttribute="{{ .Values.ldap.uidAttribute }}"
-            trustAllCerts="true">
+            trustAllCerts="true" userObjectClass="posixAccount">
         <enableVirtualHosting>true</enableVirtualHosting>
         <domains>
             {{- range .Values.ldap.additionalBaseDN }}
