@@ -181,14 +181,9 @@ data:
         <domains>
             {{- range .Values.ldap.additionalBaseDN }}
             {{ $baseDN := .baseDN }}
-            {{- $parts := splitList "." .domain }}
-            {{- range $parts }}
-            {{- printf "<%s>" . }}
-            {{- end }}
+            {{- printf "<_%s>" .domain }}
             {{- $baseDN }}
-            {{- range (reverse $parts) }}
-            {{- printf "</%s>" . }}
-            {{- end }}
+            {{- printf "</_%s>" .domain }}
             {{- end }}
         </domains>
     </usersrepository>
