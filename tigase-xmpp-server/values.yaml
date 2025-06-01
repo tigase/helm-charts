@@ -9,7 +9,7 @@ image:
   repository: tygrysinc/tigase-xmpp-server
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "nightly-2025-05-24"
+  tag: "nightly-2025-06-01"
 
 disableEnterpriseCheck: false
 
