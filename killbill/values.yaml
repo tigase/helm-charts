@@ -30,6 +30,13 @@ killbill:
     port: 8080
 
 
+# Inventory checker side care attributes
+sidecar:   
+  enabled: true  # Enable or disable the sidecar
+  name: "inventory-checker"  # Sidecar container name
+  image: "inventory-checker-sidecar"  # Sidecar image name
+  tag: "latest"  # Sidecar image tag
+
 kaui:
   image:
     repository: killbill/kaui

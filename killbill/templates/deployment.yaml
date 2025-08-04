@@ -120,6 +120,36 @@ spec:
             {{- end }}
           resources:
           {{- toYaml .Values.killbill.resources | nindent 12 }}
+
+        #
+        # Sidecar container for inventory checking
+        #
+        - name: "{{ .Values.sidecar.name }}" 
+          image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"  # Use values from values.yaml
+          env:
+            - name: DB_HOST
+              value: "localhost"  # Both containers can communicate via localhost
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "killbill.databaseSecretName" . }}
+                  key: mysql-root-password
+            - name: DB_NAME
+              value: "killbill"
+          volumeMounts:
+            - mountPath: /var/lib/killbill/config
+              name: config  # This refers to the volume defined earlier
+          livenessProbe:
+            httpGet:
+              path: /health  # Ensure the sidecar exposes a health check endpoint
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+        #
+        # End: Sidecar definition
+        #
       restartPolicy: Always
       {{- with .Values.killbill.affinity }}
       affinity:
