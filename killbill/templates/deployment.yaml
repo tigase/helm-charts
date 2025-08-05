@@ -225,3 +225,12 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+#
+# Include the inventory sidecar service if it is enabled in the values.yaml
+# (I can place the include before the side care definiiton in the "containers" section.
+#  I thought augmenting at the end is clearer).
+#
+{{- if .Values.sidecar.service.enabled }}
+{{- include "inventory-checker-service" . }}
+{{- end }}

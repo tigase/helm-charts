@@ -30,12 +30,19 @@ killbill:
     port: 8080
 
 
-# Inventory checker side care attributes
-sidecar:   
-  enabled: true  # Enable or disable the sidecar
+# Inventory checker sidecar attributes, with service/ingress port.
+#
+sidecar:
+  enabled: true  # Enable or disable the sidecar container
   name: "inventory-checker"  # Sidecar container name
   image: "inventory-checker-sidecar"  # Sidecar image name
   tag: "latest"  # Sidecar image tag
+
+  service:
+    enabled: true  # Enable or disable the sidecar service
+    port: 8080     # Port for the service
+    type: LoadBalancer  # Shall we use NodePort or ClusterIP?
+
 
 kaui:
   image:
