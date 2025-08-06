@@ -43,7 +43,7 @@ sidecar:
   service:
     enabled: true  # Enable or disable the sidecar service
     port: 8080     # Port for the service
-    type: LoadBalancer  # Shall we use NodePort or ClusterIP?
+    type: LoadBalancer  # Shall we use NodePort?
   ingressHost: "inventory-checker.tigase.net"  # FQDN for the inventory checker service
 
 
