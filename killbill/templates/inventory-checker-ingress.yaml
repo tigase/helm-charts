@@ -5,7 +5,7 @@ metadata:
   name: inventory-checker-ingress
   namespace: killbill-prod
   annotations:
-    nginx.ingress.kubernetes.io/whitelist-source-range: "141.148.186.226/32"  # Allow access only to Uptime Kuma's IP
+    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.sidecar.service.whitelistSourceRange | default "141.148.186.226/32" }}   # Allow access only to Uptime Kuma's IP
 spec:
   rules:
     - host: inventory-checker.tigase.net  # FQDN of inventory checker service
@@ -17,6 +17,6 @@ spec:
             service:
               name: inventory-checker-service
               port:
-                number: 8080
+                number: {{ .Values.sidecar.service.port | default 8080 }}
 {{- end }}
 

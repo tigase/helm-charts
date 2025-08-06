@@ -26,9 +26,11 @@ killbill:
 
   service:
     annotations: {}
-    type: ClusterIP
+    type: LoadBalancer     # Since the service is exposed outside the cluster, this cannot be ClusterIP.
     port: 8080
-
+    whitelistSourceRange: "141.148.186.226/32"  # Points to IP of Uptime Kuma IP; can be expanded to include
+                                                # IP of other management servers from where we might want to
+                                                # troubleshoot the inventory checker.
 
 # Inventory checker sidecar attributes, with service/ingress port.
 #

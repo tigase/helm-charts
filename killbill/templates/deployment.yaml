@@ -144,7 +144,7 @@ spec:
           livenessProbe:
             httpGet:
               path: /health  # Ensure the sidecar exposes a health check endpoint
-              port: 8080
+              port: {{ .Values.sidecar.service.port | default 8080 }}
             initialDelaySeconds: 10
             periodSeconds: 10
         #
