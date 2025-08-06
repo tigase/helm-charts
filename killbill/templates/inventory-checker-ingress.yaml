@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.sidecar.service.whitelistSourceRange | default "141.148.186.226/32" }}   # Allow access only to Uptime Kuma's IP
 spec:
   rules:
-    - host: inventory-checker.tigase.net  # FQDN of inventory checker service
+    - host: {{ .Values.sidecar.ingressHost }} # FQDN of inventory checker service
       http:
         paths:
         - path: /
