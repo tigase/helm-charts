@@ -1,0 +1,22 @@
+{{- define "inventory-checker-ingress" }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: inventory-checker-ingress
+  namespace: killbill-prod
+  annotations:
+    nginx.ingress.kubernetes.io/whitelist-source-range: "141.148.186.226/32"  # Allow access only to Uptime Kuma's IP
+spec:
+  rules:
+    - host: inventory-checker.tigase.net  # FQDN of inventory checker service
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: inventory-checker-service
+              port:
+                number: 8080
+{{- end }}
+

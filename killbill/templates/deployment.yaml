@@ -234,3 +234,12 @@ spec:
 {{- if .Values.sidecar.service.enabled }}
 {{- include "inventory-checker-service" . }}
 {{- end }}
+
+
+#
+# Ingress policy for inventory-checker-service
+#
+{{- if .Values.sidecar.service.enabled }}
+{{- include "inventory-checker-ingress" . | indent 2 }}
+{{- end }}
+
