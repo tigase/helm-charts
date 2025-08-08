@@ -120,6 +120,36 @@ spec:
             {{- end }}
           resources:
           {{- toYaml .Values.killbill.resources | nindent 12 }}
+
+        #
+        # Sidecar container for inventory checking
+        #
+        - name: "{{ .Values.sidecar.name }}" 
+          image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"  # Use values from values.yaml
+          env:
+            - name: DB_HOST
+              value: "localhost"  # Both containers can communicate via localhost
+            - name: DB_USER
+              value: "root"
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "killbill.databaseSecretName" . }}
+                  key: mysql-root-password
+            - name: DB_NAME
+              value: "killbill"
+          volumeMounts:
+            - mountPath: /var/lib/killbill/config
+              name: config  # This refers to the volume defined earlier
+          livenessProbe:
+            httpGet:
+              path: /health  # Ensure the sidecar exposes a health check endpoint
+              port: {{ .Values.sidecar.service.port | default 8080 }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+        #
+        # End: Sidecar definition
+        #
       restartPolicy: Always
       {{- with .Values.killbill.affinity }}
       affinity:
@@ -195,3 +225,21 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+#
+# Include the inventory sidecar service if it is enabled in the values.yaml
+# (I can place the include before the side care definiiton in the "containers" section.
+#  I thought augmenting at the end is clearer).
+#
+{{- if .Values.sidecar.service.enabled }}
+{{- include "inventory-checker-service" . }}
+{{- end }}
+
+
+#
+# Ingress policy for inventory-checker-service
+#
+{{- if .Values.sidecar.service.enabled }}
+{{- include "inventory-checker-ingress" . | indent 2 }}
+{{- end }}
+

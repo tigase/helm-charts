@@ -26,8 +26,26 @@ killbill:
 
   service:
     annotations: {}
-    type: ClusterIP
+    type: LoadBalancer     # Since the service is exposed outside the cluster, this cannot be ClusterIP.
     port: 8080
+    whitelistSourceRange: "141.148.186.226/32"  # Points to IP of Uptime Kuma IP; can be expanded to include
+                                                # IP of other management servers from where we might want to
+                                                # troubleshoot the inventory checker.
+
+# Inventory checker sidecar attributes, with service/ingress port.
+#
+sidecar:
+  enabled: true  # Enable or disable the sidecar container
+  name: "inventory-checker"  # Sidecar container name
+  image: "inventory-checker-sidecar"  # Sidecar image name
+  tag: "latest"  # Sidecar image tag
+
+  service:
+    enabled: true  # Enable or disable the sidecar service
+    port: 8080     # Port for the service
+    type: ClusterIP  # LoadBalancer is not needed since Ingress controller can route
+                     # external traffic to ClusterIP.
+  ingressHost: "inventory-checker.tigase.net"  # FQDN for the inventory checker service
 
 
 kaui:
