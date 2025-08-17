@@ -1,4 +1,3 @@
-
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -8,22 +7,21 @@ killbill:
   image:
     repository: killbill/killbill
     pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
+    tag: ""  # default is .Chart.AppVersion
 
   enableAdminUser: false
   admin:
     password: ""
-
+        
   plugins:
     persistentVolume:
       enabled: false
       storage: 1Gi
-    
+        
   resources: {}
   affinity: {}
   nodeSelector: {}
-
+  
   service:
     annotations: {}
     type: LoadBalancer     # Since the service is exposed outside the cluster, this cannot be ClusterIP.
@@ -39,7 +37,7 @@ sidecar:
   name: "inventory-checker"  # Sidecar container name
   image: "inventory-checker-sidecar"  # Sidecar image name
   tag: "latest"  # Sidecar image tag
-
+  
   service:
     enabled: true  # Enable or disable the sidecar service
     port: 8080     # Port for the service
@@ -108,3 +106,4 @@ securityContext: {}
   # readOnlyRootFilesystem: true
   # runAsNonRoot: true
 # runAsUser: 1000
+
