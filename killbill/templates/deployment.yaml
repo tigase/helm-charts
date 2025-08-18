@@ -27,7 +27,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{/*      serviceAccountName: {{ include "killbill.serviceAccountName" . }}*/}}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       {{- if .Values.database.loadSchema }}
@@ -45,7 +44,7 @@ spec:
               wget http://docs.killbill.io/{{ .Values.killbill.version }}/ddl.sql -O - >> /schema/killbill-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-admin-ui/master/db/ddl.sql -O - >> /schema/kaui-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-stripe-plugin/master/src/main/resources/ddl.sql -O - >> /schema/killbill-ddl.sql
-              wget https://raw.githubusercontent.com/killbill/killbill-analytics-plugin/master/src/main/resources/org/killbill/billing/plugin/analytics/ddl.sql - >> /schema/killbill-ddl.sql
+              wget https://raw.githubusercontent.com/killbill/killbill-analytics-plugin/master/src/main/resources/org/killbill/billing/plugin/analytics/ddl.sql -O - >> /schema/killbill-ddl.sql
               wget https://raw.githubusercontent.com/killbill/killbill-adyen-plugin/master/src/main/resources/ddl.sql -O - >> /schema/killbill-ddl.sql
               echo "INSERT INTO kaui.kaui_allowed_users (kb_username, description, created_at, updated_at) values ('admin', 'super admin', NOW(), NOW());" >> /schema/kaui-ddl.sql
               echo 'DONE!'
@@ -64,8 +63,8 @@ spec:
             - /bin/sh
             - "-c"
             - |
-              mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }}  < /schema/killbill-ddl.sql
-              mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }}  < /schema/kaui-ddl.sql
+              mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }} < /schema/killbill-ddl.sql
+              mysql -u root -p$MYSQL_ROOT_PASSWORD -h {{ include "killbill.databaseHost" . }} < /schema/kaui-ddl.sql
               echo 'Database schemas loaded!'
           volumeMounts:
             - mountPath: /schema
@@ -83,18 +82,17 @@ spec:
         {{- if .Values.killbill.plugins.persistentVolume.enabled }}
         - name: plugins
           persistentVolumeClaim:
-          {{- if .Values.killbill.plugins.persistentVolume.existingClaim }}
+            {{- if .Values.killbill.plugins.persistentVolume.existingClaim }}
             claimName: {{ .Values.killbill.plugins.persistentVolume.existingClaim }}
-          {{- end }}
-          {{- if not .Values.killbill.plugins.persistentVolume.existingClaim }}
+            {{- else }}
             claimName: {{ include "killbill.fullname" . }}-plugins
-          {{- end }}
+            {{- end }}
         {{- end }}
-          
+
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-          {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.killbill.image.repository }}:{{ .Values.killbill.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.killbill.image.pullPolicy }}
           ports:
@@ -119,16 +117,13 @@ spec:
               name: plugins
             {{- end }}
           resources:
-          {{- toYaml .Values.killbill.resources | nindent 12 }}
+            {{- toYaml .Values.killbill.resources | nindent 12 }}
 
-        #
-        # Sidecar container for inventory checking
-        #
-        - name: "{{ .Values.sidecar.name }}" 
-          image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"  # Use values from values.yaml
+        - name: "{{ .Values.sidecar.name }}"
+          image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"
           env:
             - name: DB_HOST
-              value: "localhost"  # Both containers can communicate via localhost
+              value: "localhost"
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD
@@ -140,16 +135,14 @@ spec:
               value: "killbill"
           volumeMounts:
             - mountPath: /var/lib/killbill/config
-              name: config  # This refers to the volume defined earlier
+              name: config
           livenessProbe:
             httpGet:
-              path: /health  # Ensure the sidecar exposes a health check endpoint
+              path: /health
               port: {{ .Values.sidecar.service.port | default 8080 }}
             initialDelaySeconds: 10
             periodSeconds: 10
-        #
-        # End: Sidecar definition
-        #
+
       restartPolicy: Always
       {{- with .Values.killbill.affinity }}
       affinity:
@@ -159,7 +152,9 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -187,13 +182,12 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-{{/*      serviceAccountName: {{ include "killbill.serviceAccountName" . }}*/}}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ include "kaui.fullname" . }}
           securityContext:
-          {{- toYaml .Values.securityContext | nindent 12 }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.kaui.image.repository }}:{{ .Values.kaui.image.tag }}"
           imagePullPolicy: {{ .Values.kaui.image.pullPolicy }}
           ports:
@@ -226,16 +220,16 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
+---
+
 #
 # Include the inventory sidecar service if it is enabled in the values.yaml
-# (I can place the include before the side care definiiton in the "containers" section.
-#  I thought augmenting at the end is clearer).
 #
 {{- if .Values.sidecar.service.enabled }}
 {{- include "inventory-checker-service" . }}
 {{- end }}
 
-
+---
 #
 # Ingress policy for inventory-checker-service
 #
