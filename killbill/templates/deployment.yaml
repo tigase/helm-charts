@@ -92,7 +92,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
-            {{- toYaml .Values.securityContext | nindent 6 }}
+            {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.killbill.image.repository }}:{{ .Values.killbill.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.killbill.image.pullPolicy }}
           ports:
@@ -117,7 +117,7 @@ spec:
               name: plugins
             {{- end }}
           resources:
-            {{- toYaml .Values.killbill.resources | nindent 6 }}
+            {{- toYaml .Values.killbill.resources | nindent 12 }}
 
       {{- if .Values.sidecar.enabled }}
         - name: "{{ .Values.sidecar.name }}"
