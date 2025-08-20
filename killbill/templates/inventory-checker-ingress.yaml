@@ -1,9 +1,10 @@
 {{- define "inventory-checker-ingress" }}
+{{- if and .Values.sidecar.enabled .Values.sidecar.service.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: inventory-checker-ingress
-  namespace: killbill-prod
+  namespace: {{ .Release.Namespace }}
   annotations:
     nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.sidecar.service.whitelistSourceRange | default "141.148.186.226/32" }}   # Allow access only to Uptime Kuma's IP
 spec:
@@ -15,8 +16,8 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: inventory-checker-service
+              name: {{ include "inventory-checker-service-name" . | default "inventory-checker-service" }}
               port:
                 number: {{ .Values.sidecar.service.port | default 8080 }}
 {{- end }}
-
+{{- end }}

@@ -33,13 +33,13 @@ killbill:
 # Inventory checker sidecar attributes, with service/ingress port.
 #
 sidecar:
-  enabled: true  # Enable or disable the sidecar container
+  enabled: false  # Tentatively disable sidecar, till docker image tag of sidecar is finalize.
   name: "inventory-checker"  # Sidecar container name
   image: "inventory-checker-sidecar"  # Sidecar image name
   tag: "latest"  # Sidecar image tag
   
   service:
-    enabled: true  # Enable or disable the sidecar service
+    enabled: false  # Tentatively disable this service
     port: 8080     # Port for the service
     type: ClusterIP  # LoadBalancer is not needed since Ingress controller can route
                      # external traffic to ClusterIP.
