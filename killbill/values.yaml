@@ -20,7 +20,8 @@ killbill:
         
   resources: {}
   affinity: {}
-  nodeSelector: {}
+  nodeSelector:
+    kubernetes.io/arch: amd64
   
   service:
     annotations: {}
@@ -33,14 +34,14 @@ killbill:
 # Inventory checker sidecar attributes, with service/ingress port.
 #
 sidecar:
-  enabled: false  # Tentatively disable sidecar, till docker image tag of sidecar is finalize.
+  enabled: true  # Tentatively disable sidecar, till docker image tag of sidecar is finalize.
   name: "inventory-checker"  # Sidecar container name
-  image: "inventory-checker-sidecar"  # Sidecar image name
-  tag: "latest"  # Sidecar image tag
+  image: "rktigasedocker/inventory-checker"
+  tag: "v1.0.20-contentlength" # Sidecar image tag "latest" also exists.
   
   service:
-    enabled: false  # Tentatively disable this service
-    port: 8080     # Port for the service
+    enabled: true  # Tentatively disable this service
+    port: 8081     # Port for the service - this should match what is in inventory checker Dockerfile
     type: ClusterIP  # LoadBalancer is not needed since Ingress controller can route
                      # external traffic to ClusterIP.
   ingressHost: "inventory-checker.tigase.net"  # FQDN for the inventory checker service
@@ -64,7 +65,7 @@ database:
   port: 3306
   killbill: "killbill"
   kaui: "kaui"
-  existingSecret: ""
+  existingSecret: mysql-credentials
   loadSchema: false
 
 ingress:

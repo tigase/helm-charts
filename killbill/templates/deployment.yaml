@@ -120,8 +120,10 @@ spec:
             {{- toYaml .Values.killbill.resources | nindent 12 }}
 
       {{- if .Values.sidecar.enabled }}
-        - name: "{{ .Values.sidecar.name }}"
+        - name: {{ .Values.sidecar.name }}
           image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"
+          ports:
+            - containerPort: {{ .Values.sidecar.service.port | default 8081 }}
           env:
             - name: DB_HOST
               value: "localhost"
@@ -134,13 +136,15 @@ spec:
                   key: mysql-root-password
             - name: DB_NAME
               value: "killbill"
+            - name: PORT
+              value: "{{ .Values.sidecar.service.port | default "8081" }}"
           volumeMounts:
             - mountPath: /var/lib/killbill/config
               name: config
           livenessProbe:
             httpGet:
               path: /health
-              port: {{ .Values.sidecar.service.port | default 8080 }}
+              port: {{ .Values.sidecar.service.port | default 8081 }}
             initialDelaySeconds: 10
             periodSeconds: 10
       {{- end }}

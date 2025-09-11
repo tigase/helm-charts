@@ -9,6 +9,10 @@ Expand the name of the chart.
 {{- default "kaui" .Values.kaui.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+{{- define "inventory-checker-service-name" -}}
+{{ .Values.sidecar.name }}
+{{- end }}
+
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
