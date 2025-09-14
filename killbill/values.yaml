@@ -37,7 +37,8 @@ sidecar:
   enabled: true  # Tentatively disable sidecar, till docker image tag of sidecar is finalize.
   name: "inventory-checker"  # Sidecar container name
   image: "rktigasedocker/inventory-checker"
-  tag: "v1.0.20-contentlength" # Sidecar image tag "latest" also exists.
+  #tag: "go-v1.0.0" # Sidecar image tag switched to Go implementation of REST endpoint.
+  tag: "go-v1.0.1"
   
   service:
     enabled: true  # Tentatively disable this service

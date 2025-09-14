@@ -122,11 +122,18 @@ spec:
       {{- if .Values.sidecar.enabled }}
         - name: {{ .Values.sidecar.name }}
           image: "{{ .Values.sidecar.image }}:{{ .Values.sidecar.tag }}"
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8081
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            failureThreshold: 3
           ports:
             - containerPort: {{ .Values.sidecar.service.port | default 8081 }}
           env:
             - name: DB_HOST
-              value: "localhost"
+              value: "killbill-mysql"
             - name: DB_USER
               value: "root"
             - name: DB_PASSWORD

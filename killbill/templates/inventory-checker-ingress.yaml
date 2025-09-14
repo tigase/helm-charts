@@ -16,7 +16,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: {{ include "inventory-checker-service-name" . | default "inventory-checker-service" }}
+              name: {{ .Values.sidecar.name }}-service
               port:
                 number: {{ .Values.sidecar.service.port | default 8080 }}
 {{- end }}
