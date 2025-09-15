@@ -6,11 +6,13 @@ metadata:
   name: {{ .Values.sidecar.name }}-service
 spec:
   selector:
-    app: {{ .Release.Name }}  # This should match the KillBill app label
+    app.kubernetes.io/name: killbill
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    tier: server
   ports:
     - protocol: TCP
       port: {{ .Values.sidecar.service.port }}
-      targetPort: 8081
-  type: {{ .Values.sidecar.service.type | default "ClusterIP" }}  # Can be LoadBalancer, NodePort if needed.
-{{- end }}  # Close the 'if' block
-{{- end }}  # Close the 'define' block
+      targetPort: inventory-http
+  type: {{ .Values.sidecar.service.type | default "ClusterIP" }}
+{{- end }}
+{{- end }}

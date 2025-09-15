@@ -5,8 +5,8 @@ kind: Ingress
 metadata:
   name: inventory-checker-ingress
   namespace: {{ .Release.Namespace }}
-  annotations:
-    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.sidecar.service.whitelistSourceRange | default "141.148.186.226/32" }}   # Allow access only to Uptime Kuma's IP
+  #annotations:
+    #nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.sidecar.service.whitelistSourceRange | default "141.148.186.226/32" }}   # Allow access only to Uptime Kuma's IP
 spec:
   rules:
     - host: {{ .Values.sidecar.ingressHost }} # FQDN of inventory checker service
@@ -18,6 +18,6 @@ spec:
             service:
               name: {{ .Values.sidecar.name }}-service
               port:
-                number: {{ .Values.sidecar.service.port | default 8080 }}
+                number: 8081
 {{- end }}
 {{- end }}
