@@ -130,7 +130,9 @@ spec:
             periodSeconds: 5
             failureThreshold: 3
           ports:
-            - containerPort: {{ .Values.sidecar.service.port | default 8081 }}
+            - name: inventory-http
+              containerPort: {{ .Values.sidecar.service.port | default 8081 }}
+              protocol: TCP
           env:
             - name: DB_HOST
               value: "killbill-mysql"
