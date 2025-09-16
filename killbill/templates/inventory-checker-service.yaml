@@ -10,7 +10,8 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     tier: server
   ports:
-    - protocol: TCP
+    - name: inventory-http        # Important: This is required
+      protocol: TCP
       port: {{ .Values.sidecar.service.port }}
       targetPort: inventory-http
   type: {{ .Values.sidecar.service.type | default "ClusterIP" }}
