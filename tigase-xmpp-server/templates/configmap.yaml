@@ -243,6 +243,20 @@ ws2s {
 {{- end}}
 {{- end }}
 
+{{- define "env-config" }}
+OSGI=${osgiEnabled}
+ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
+CLASSPATH=""
+PRODUCTION_HEAP_SETTINGS=" -XX:MaxRAMPercentage=60 " # dynamic sizing, *preferred* and more universal
+JAVA_XSS=" -Xss228k "
+## Uncomment and adjust if needed (most likely only on servers with more than 64 cores)
+#JAVA_DIRECT_MEMORY=" -XX:MaxDirectMemorySize=128m "
+JAVA_METASPACE=" -XX:MaxMetaspaceSize=160m " # because of aws/s3
+
+JAVA_OPTIONS="${GC} ${GC_DEBUG} ${JVM_DEBUG} ${JVM_RESTART_ON_OOM} ${TLS_DEBUG} ${JVM_MEMORY} ${REMOTE_DEBUG} ${EX} ${ENC} ${FULL_STACKTRACES} ${JMX_REMOTE_IP} ${DISABLE_LOGGER_COLOR} -server ${PRODUCTION_HEAP_SETTINGS} ${JAVA_YOUNG_GEN_EXPLICIT_SIZE} ${JAVA_XSS} ${JAVA_DIRECT_MEMORY} ${JAVA_METASPACE} "
+TIGASE_OPTIONS=" "
+{{- end }}
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -251,3 +265,4 @@ metadata:
     {{- include "tigase-xmpp-server.labels" . | nindent 4 }}
 data:
   config.tdsl: {{ (include "config" .) | trim | quote }}
+  tigase.conf: {{ (include "env-config" .) | trim | quote }}

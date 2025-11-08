@@ -175,6 +175,8 @@ spec:
           items:
           - key: "config.tdsl"
             path: "config.tdsl"
+          - key: "tigase.conf"
+            path: "tigase.conf"
       {{- if eq .Values.fileUpload.storage "persistent-volume" }}
       - name: upload-data
         persistentVolumeClaim:
