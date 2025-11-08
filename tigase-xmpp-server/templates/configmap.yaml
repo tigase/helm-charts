@@ -247,7 +247,11 @@ ws2s {
 OSGI=${osgiEnabled}
 ENC="-Dfile.encoding=UTF-8 -Dsun.jnu.encoding=UTF-8"
 CLASSPATH=""
-PRODUCTION_HEAP_SETTINGS=" -XX:MaxRAMPercentage=60 " # dynamic sizing, *preferred* and more universal
+{{- if .Values.maxMemoryPercentage }}
+PRODUCTION_HEAP_SETTINGS=" -XX:MaxRAMPercentage={{ .Values.maxMemoryPercentage }} " # dynamic sizing, *preferred* and more universal
+{{- else }}
+#PRODUCTION_HEAP_SETTINGS=" -XX:MaxRAMPercentage=80" # dynamic sizing, *preferred* and more universal
+{{- end }}
 JAVA_XSS=" -Xss228k "
 ## Uncomment and adjust if needed (most likely only on servers with more than 64 cores)
 #JAVA_DIRECT_MEMORY=" -XX:MaxDirectMemorySize=128m "
