@@ -11,7 +11,7 @@ spec:
         spec:
           containers:
             - name: cert-reload
-              image: curlimages/curl:7.87.0
+              image: docker.io/curlimages/curl:7.87.0
               imagePullPolicy: IfNotPresent
               env:
                 - name: JAMES_SERVICE

@@ -6,7 +6,7 @@
 replicaCount: 1
 
 image:
-  repository: tygrysinc/tygrys-xmpp-web
+  repository: docker.io/tygrysinc/tygrys-xmpp-web
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

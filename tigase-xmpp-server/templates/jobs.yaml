@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
         - name: cert-uploader
-          image: curlimages/curl:7.87.0
+          image: docker.io/curlimages/curl:7.87.0
           imagePullPolicy: IfNotPresent
           env:
             - name: TIGASE_SERVICE

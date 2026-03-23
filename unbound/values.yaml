@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: mvance/unbound
+  repository: docker.io/mvance/unbound
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

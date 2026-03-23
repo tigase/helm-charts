@@ -4,7 +4,7 @@
 
 onedev:
   image:
-    repository: tygrysinc/1dev-server
+    repository: docker.io/tygrysinc/1dev-server
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
@@ -63,7 +63,7 @@ onedev:
 
 mysql:
   image:
-    repository: mysql
+    repository: docker.io/library/mysql
     pullPolicy: IfNotPresent
     tag: "8.0"
   
