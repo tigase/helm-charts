@@ -29,7 +29,7 @@ spec:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       initContainers:
         - name: init
-          image: busybox:1.28
+          image: docker.io/library/busybox:1.28
           command: ["sh", "-c", "until nslookup {{ include "james.databaseHost" . }}; do echo waiting for mysql; sleep 2; done;"]
         {{- with .Values.initContainers }}
         {{- toYaml . | nindent 8 }}

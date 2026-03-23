@@ -33,7 +33,7 @@ spec:
       {{- if .Values.database.loadSchema }}
       initContainers:
         - name: download-schema
-          image: busybox
+          image: docker.io/library/busybox
           command:
             - /bin/sh
             - "-c"

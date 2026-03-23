@@ -78,7 +78,7 @@ spec:
       initContainers:
       {{- if .Values.backup.persistentVolume.enabled }}
         - name: init-from-pv
-          image: busybox
+          image: docker.io/library/busybox
           command: 
             - /bin/sh
             - "-c"
@@ -114,7 +114,7 @@ spec:
               mountPath: /var/lib/mysql
       {{- end }}      
         - name: init-s3-config
-          image: minio/mc
+          image: docker.io/minio/mc
           env:
             - name: S3_ENDPOINT
               value: {{ .Values.backup.s3.endpoint | quote }}
