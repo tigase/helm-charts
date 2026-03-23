@@ -103,7 +103,7 @@ spec:
       {{- if .Values.backup.s3.enabled }}
       {{- if .Values.backup.s3.forceRestore }}
         - name: drop-data
-          image: perconalab/percona-xtrabackup:8.0.26-18
+          image: docker.io/perconalab/percona-xtrabackup:8.0.26-18
           command:
             - /bin/sh
             - "-c"
@@ -145,7 +145,7 @@ spec:
             - name: mysql-s3-config
               mountPath: /s3-config
         - name: init-s3
-          image: perconalab/percona-xtrabackup:8.0.26-18
+          image: docker.io/perconalab/percona-xtrabackup:8.0.26-18
           env:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:

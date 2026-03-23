@@ -21,7 +21,7 @@ spec:
               topologyKey: "kubernetes.io/hostname" 
       containers:
         - name: mysql-backup-s3-on-demand
-          image: perconalab/percona-xtrabackup:8.0.26-18
+          image: docker.io/perconalab/percona-xtrabackup:8.0.26-18
           imagePullPolicy: IfNotPresent
           env:
             - name: MYSQL_ROOT_PASSWORD
@@ -86,7 +86,7 @@ spec:
     spec:
       containers:
         - name: mysql-s3-expire-setup
-          image: minio/mc
+          image: docker.io/minio/mc
           env:
             - name: S3_EXPIRE_IN_DAYS
               value: {{ .Values.backup.s3.expireInDays | quote }}

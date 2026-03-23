@@ -22,7 +22,7 @@ spec:
                   topologyKey: "kubernetes.io/hostname" 
           containers:
             - name: mysql-xtrabackup
-              image: perconalab/percona-xtrabackup:8.0.26-18
+              image: docker.io/perconalab/percona-xtrabackup:8.0.26-18
               imagePullPolicy: IfNotPresent
               env:
                 - name: MYSQL_ROOT_PASSWORD
@@ -88,7 +88,7 @@ spec:
                   topologyKey: "kubernetes.io/hostname" 
           containers:
             - name: mysql-xtrabackup
-              image: perconalab/percona-xtrabackup:8.0.26-18
+              image: docker.io/perconalab/percona-xtrabackup:8.0.26-18
               imagePullPolicy: IfNotPresent
               env:
                 - name: MYSQL_ROOT_PASSWORD
