@@ -15,6 +15,8 @@ spec:
           env:
             - name: TIGASE_SERVICE
               value: {{ include "tigase-xmpp-server.fullname" $root | quote }}
+            - name: TIGASE_PORT
+              value: {{ $root.Values.service.ports.http | quote }}
             - name: DOMAIN
               value: {{ $domain }}
             {{- if $root.Values.certificate.refresh.apiKey }}
@@ -70,7 +72,7 @@ spec:
                 </item>
               </fields>
               </command>"
-              RESPONSE=`curl -s -L -H "Content-Type: text/xml" -X POST ${AUTH} http://${TIGASE_SERVICE}:8080/rest/adhoc/vhost-man@${domain}${API_KEY} -d "${REQUEST}"`
+              RESPONSE=`curl -s -L -H "Content-Type: text/xml" -X POST ${AUTH} http://${TIGASE_SERVICE}:${TIGASE_PORT}/rest/adhoc/vhost-man@${domain}${API_KEY} -d "${REQUEST}"`
               if [[ ! "${RESPONSE}" = *"loaded successfully"* ]]; then
                 echo "Server returned error while updating ${domain} certificate: \n ${RESPONSE}"
               else
